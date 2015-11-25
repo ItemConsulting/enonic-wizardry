@@ -4,6 +4,22 @@ Functional utility library for Enonic XP
 
 ## API
 
+### pipe
+
+> `(((a, b, …, n) → o), (o → p), …, (x → y), (y → z)) → ((a, b, …, n) → z)`
+
+Creates a new function from n functions, by walkting trough them left to right, and passing the result of the previous function into the next one.
+
+See [Ramdas pipe](http://ramdajs.com/0.18.0/docs/#pipe).
+
+```javascript
+var add1 = function(x){ return x+1; }
+var times2 = function(x){ return x*2; }
+
+var f = w.pipe(add1, times2);
+var result = f(3); => 8
+```
+
 ### html.tag
 
 > `String → [String] → ({*} → {*})`
@@ -13,10 +29,10 @@ Creates a function that adds a `$body` attribute to a model. Takes the `elementN
 If the model already contains a `$body` it will be wrapped in this tag.
 
 ```javascript
-var fooTag = w.html.tag('foo', ['bar']); // => function
+var f = w.html.tag('foo', ['bar']); // => function
 
-var result = fooTag({ bar: 'baz' }); // => { bar: 'baz', $body: '<foo bar="baz" />' }
-var result2 = fooTag({ $body: 'Hi' }); // => { $body: '<foo>Hi</foo>' }
+var result = f({ bar: 'baz' }); // => { bar: 'baz', $body: '<foo bar="baz" />' }
+var result2 = f({ $body: 'Hi' }); // => { $body: '<foo>Hi</foo>' }
 ```
 
 ### bootstrap.panel
@@ -48,6 +64,8 @@ var result = w.bootstrap.panel(model).$body; // => see below
 ```
 
 ### asHtml
+
+ > `{*} → {*}`
 
 Takes a model which contains a `$body` attribute, and creates a Enonic compatible result object.
 
