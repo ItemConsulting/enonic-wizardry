@@ -1,0 +1,29 @@
+{
+  "name": "wizardry",
+  "version": "0.0.1",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/karma-runner/gulp-karma"
+  },
+  "bugs": {
+    "url": "https://github.com/karma-runner/gulp-karma/issues"
+  },
+  "homepage": "https://github.com/karma-runner/gulp-karma",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-bower": "0.0.11",
+    "gulp-browserify": "^0.5.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-mocha": "^2.2.0",
+    "gulp-sourcemaps": "^1.6.0",
+    "jasmine": "^2.3.2",
+    "jasmine-core": "^2.3.4",
+    "karma": "^0.13.15",
+    "karma-chrome-launcher": "^0.2.1",
+    "karma-jasmine": "^0.3.6",
+    "lodash": "^3.10.1",
+    "ramda": "^0.18.0",
+    "stream-series": "^0.1.1"
+  }
+}
