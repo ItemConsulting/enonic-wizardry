@@ -17,7 +17,7 @@ var add1 = function(x){ return x+1; }
 var times2 = function(x){ return x*2; }
 
 var f = w.pipe(add1, times2);
-var result = f(3); => 8
+var result = f(3); // => 8
 ```
 
 ### html.tag
