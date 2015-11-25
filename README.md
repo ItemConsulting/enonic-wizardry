@@ -22,7 +22,7 @@ var result = f(3); // => 8
 
 ### html.tag
 
-> `String → [String] → ({*} → {*})`
+> (`String, [String]) → ({*} → {*})`
 
 Creates a function that adds a `$body` attribute to a model. Takes the `elementName`, and an array of attribute names that will get values from the model.
 
@@ -81,6 +81,3 @@ var result = w.asHtml({ $body: '<div>test</div>' }); // => see below
     "body": "<div>test</div>"
 }
 ```
-
-
-### asJson
