@@ -20,13 +20,23 @@ var result2 = fooTag({ $body: 'Hi' }); // => { $body: '<foo>Hi</foo>' }
 
 ### bootstrap.panel
 
-Expects the model to contain `id`, `title` and `$body` fields.
+ > {*} → {*}
+
+Creates a function wraps the current `$body` attribute with a [bootstrap panel](http://getbootstrap.com/components/#panels).
+
+Expects the model to contain `id`, `title` and `$body` attribute.
 
 ```javascript
-var result = w.bootstrap.panel({ id: 'panel-1', title: 'My title', $body: 'Hi' }); // => { ..., $body: '<se below>' }
+var model = {
+    id: 'panel-1',
+    title: 'My title',
+    $body: 'Hi'
+}
+var newModel = w.bootstrap.panel(model); // => { ..., $body: '<se below>' }
+var result = newModel.$body;
 ```
 
-*Contents of $body*
+*Contents of result*
 
 ```html
 <div class="panel panel-default" id="panel-1">
