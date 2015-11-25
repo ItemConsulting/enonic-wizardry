@@ -2,6 +2,26 @@
 
 Functional utility library for Enonic XP
 
+## Building and deploying
+
+Requirements:
+
+ * [npm](https://www.npmjs.com)
+ * [gulp](http://gulpjs.com/)
+
+#### Building
+
+```bash
+npm install
+gulp
+```
+
+#### Testing
+
+```bash
+gulp test
+```
+
 ## API
 
 ### pipe

@@ -1,5 +1,5 @@
 var assert = require('assert');
-var _ = require('lodash');
+var R = require('ramda');
 var html = require('../lib/html');
 
 describe('html', function() {
@@ -17,7 +17,7 @@ describe('html', function() {
         it('should combine tags with compose', function () {
             var fooTag = html.tag('foo', ['a']);
             var barTag = html.tag('bar', ['b']);
-            var foobar = _.compose(barTag, fooTag);
+            var foobar = R.compose(barTag, fooTag);
 
             assert.equal('<bar b="2"><foo a="1"></foo></bar>', foobar(model).$body);
         });

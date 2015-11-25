@@ -1,5 +1,5 @@
 var assert = require('assert');
-var _ = require('lodash');
+var R = require('ramda');
 var html = require('../lib/html');
 var core = require('../lib/core');
 
@@ -8,7 +8,7 @@ describe('core', function() {
         it('should return of type text/html with correct body', function () {
             var model = {};
             var fooTag = html.tag('foo', []);
-            var fooMapper = _.compose(core.asHtml, fooTag);
+            var fooMapper = R.compose(core.asHtml, fooTag);
             var result = fooMapper(model);
 
             assert.equal('text/html', result.contentType);

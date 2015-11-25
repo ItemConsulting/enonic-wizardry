@@ -3,7 +3,7 @@ var mocha = require('gulp-mocha');
 var browserify = require('gulp-browserify');
 
 gulp.task('default', function () {
-    return gulp.src("wizardry.js")
+    return gulp.src(["wizardry.js", '!./lib/enonic.js'])
         .pipe(browserify())
         .pipe(gulp.dest("./dest"));
 });
