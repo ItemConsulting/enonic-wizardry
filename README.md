@@ -44,33 +44,33 @@ var result = f(3); // => 8
 
 > (`String, [String]) → ({*} → {*})`
 
-Creates a function that adds a `$body` attribute to a model. Takes the `elementName`, and an array of attribute names that will get values from the model.
+Creates a function that adds a `body` attribute to a model. Takes the `elementName`, and an array of attribute names that will get values from the model.
 
-If the model already contains a `$body` it will be wrapped in this tag.
+If the model already contains a `body` it will be wrapped in this tag.
 
 ```javascript
 var f = w.html.tag('foo', ['bar']); // => function
 
-var result = f({ bar: 'baz' }); // => { bar: 'baz', $body: '<foo bar="baz" />' }
-var result2 = f({ $body: 'Hi' }); // => { $body: '<foo>Hi</foo>' }
+var result = f({ bar: 'baz' }); // => { bar: 'baz', body: '<foo bar="baz" />' }
+var result2 = f({ body: 'Hi' }); // => { body: '<foo>Hi</foo>' }
 ```
 
 ### bootstrap.panel
 
  > `{*} → {*}`
 
-Creates a function wraps the current `$body` attribute with a [bootstrap panel](http://getbootstrap.com/components/#panels), and stores the result to `$body`
+Creates a function wraps the current `body` attribute with a [bootstrap panel](http://getbootstrap.com/components/#panels), and stores the result to `body`
 
-Expects the model to contain `id`, `title` and `$body` attribute.
+Expects the model to contain `id`, `title` and `body` attribute.
 
 ```javascript
 var model = {
     id: 'panel-1',
     title: 'My title',
-    $body: 'Hi'
+    body: 'Hi'
 }
 
-var result = w.bootstrap.panel(model).$body; // => see below
+var result = w.bootstrap.panel(model).body; // => see below
 ```
 *Contents of result*
 
@@ -87,10 +87,10 @@ var result = w.bootstrap.panel(model).$body; // => see below
 
  > `{*} → {*}`
 
-Takes a model which contains a `$body` attribute, and creates a Enonic compatible result object.
+Takes a model which contains a `body` attribute, and creates a Enonic compatible result object.
 
 ```javascript
-var result = w.asHtml({ $body: '<div>test</div>' }); // => see below
+var result = w.asHtml({ body: '<div>test</div>' }); // => see below
 ```
 
 *Contents of result*

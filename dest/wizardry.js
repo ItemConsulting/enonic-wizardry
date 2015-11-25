@@ -17,7 +17,7 @@ var core = require('./core');
 var panelTemplate = function(model){
     var tpl = '<div class="panel panel-default" id="{{id}}">' +
         '<div class="panel-heading"><h3 class="panel-title">{{title}}</h3></div>' +
-        '<div class="panel-body">{{$body}}</div>' +
+        '<div class="panel-body">{{body}}</div>' +
     '</div>';
 
     return template(model, tpl);
@@ -87,7 +87,7 @@ var applyAndAssign = R.curry(function(f, model){
 });
 
 var applyTemplate = function(f){
-    var mapper = R.compose(newObjectWithAttribute('$body'), f);
+    var mapper = R.compose(newObjectWithAttribute('body'), f);
     return applyAndAssign(mapper);
 };
 
@@ -107,8 +107,8 @@ var as = R.curry(function(contentType, body){
 });
 
 var extractBody = function(model){
-    if(R.has('$body', model)){
-        return R.prop('$body', model);
+    if(R.has('body', model)){
+        return R.prop('body', model);
     } else {
         return model;
     }
@@ -129,13 +129,13 @@ var collapseToAttribute = function(result, pair){ return result + ' ' + pair[0] 
 var collapseToAttributes = R.compose(R.reduce(collapseToAttribute, ''), R.toPairs);
 
 var elementTemplate = function(model){
-    var tpl = '<{{$elementName}}{{$attrs}}>{{$body}}</{{$elementName}}>';
+    var tpl = '<{{$elementName}}{{$attrs}}>{{body}}</{{$elementName}}>';
     return template(model, tpl);
 };
 
 var elementModel = R.curry(function(elementName, elementAttrs, model){
     return R.merge(model, {
-        '$body': model.$body,
+        'body': model.body,
         '$elementName': elementName,
         '$attrs': collapseToAttributes(R.pickAll(elementAttrs, model))
     });
