@@ -20,7 +20,7 @@ var result2 = fooTag({ $body: 'Hi' }); // => { $body: '<foo>Hi</foo>' }
 
 ### bootstrap.panel
 
- > {*} → {*}
+ > `{*} → {*}`
 
 Creates a function wraps the current `$body` attribute with a [bootstrap panel](http://getbootstrap.com/components/#panels).
 
@@ -32,8 +32,7 @@ var model = {
     title: 'My title',
     $body: 'Hi'
 }
-var newModel = w.bootstrap.panel(model); // => { ..., $body: '<se below>' }
-var result = newModel.$body;
+var result = w.bootstrap.panel(model).$body;
 ```
 
 *Contents of result*
