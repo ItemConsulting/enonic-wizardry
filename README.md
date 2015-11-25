@@ -6,13 +6,13 @@ Functional utility library for Enonic XP
 
 ### html.tag
 
-> String → [String] → ({*} → {*})
+> String → [String] → ({k:v} → {k:v})
 
 Creates a function that adds a `$body` attribute to a model. Takes the `elementName`, and an array of attribute names that will get values from the model.
 
 If the model already contains a `$body` it will be wrapped in this tag.
 
-```
+```javascript
    var fooTag = w.html.tag('foo', ['bar']);
    var result = fooTag({ bar: 'baz' }); // => { bar: 'baz', $body: '<foo bar="baz" />' }
    var result2 = fooTag({ $body: 'Hei' }); // => { $body: '<foo>Hei</foo>' }
