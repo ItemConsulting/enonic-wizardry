@@ -1,5 +1,5 @@
 {
-  "name": "wizardry",
+  "name": "enonic-wizardry",
   "version": "0.0.2",
   "description": "Functional utility library for Enonic XP",
   "main": "lib/index.js",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ItemConsulting/wizardry.git"
+    "url": "git+https://github.com/ItemConsulting/enonic-wizardry.git"
   },
   "keywords": [
     "enonic",
@@ -20,9 +20,9 @@
   "author": "Tom Arild Jakobsen <tajakobsen@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ItemConsulting/wizardry/issues"
+    "url": "https://github.com/ItemConsulting/enonic-wizardry/issues"
   },
-  "homepage": "https://github.com/ItemConsulting/wizardry#readme",
+  "homepage": "https://github.com/ItemConsulting/enonic-wizardry#readme",
   "dependencies": {
     "enonic-fp": "^0.0.3",
     "fp-ts": "^2.0.5"
