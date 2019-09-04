@@ -1,7 +1,7 @@
 import * as context from "enonic-fp/lib/context";
 
-export function runAsSuperUser<T>(f: () => T) {
-  return context.run({
+export function runAsSuperUser<A, B>(f: (p:A) => B) : (p: A) => B {
+  return (params: A) => context.run({
     repository: 'com.enonic.cms.default',
     branch: 'draft',
     user: {
@@ -9,11 +9,11 @@ export function runAsSuperUser<T>(f: () => T) {
       idProvider: 'system'
     },
     principals: ["role:system.admin"]
-  }, f);
+  }, () => f(params));
 }
 
-export function runInDraftContext<T>(f: () => T) {
-  return context.run({
+export function runInDraftContext<A, B>(f: (p: A) =>  B) : (p: A) => B {
+  return (params: A) => context.run({
     branch: 'draft'
-  }, f);
+  }, () => f(params));
 }

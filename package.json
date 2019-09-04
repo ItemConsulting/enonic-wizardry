@@ -1,6 +1,6 @@
 {
   "name": "enonic-wizardry",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "Functional utility library for Enonic XP",
   "main": "lib/index.js",
   "module": "es6/index.js",
@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/ItemConsulting/enonic-wizardry#readme",
   "dependencies": {
-    "enonic-fp": "^0.0.3",
+    "enonic-fp": "^0.0.8",
     "fp-ts": "^2.0.5"
   },
   "devDependencies": {
