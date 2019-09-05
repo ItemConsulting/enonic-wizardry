@@ -1,4 +1,17 @@
-import { Response } from "enonic-fp/lib/common";
+import { Error, ErrorKey, Response } from "enonic-fp/lib/common";
+import { localize } from "enonic-fp/lib/i18n";
+import { getOrElse } from 'fp-ts/lib/Option'
+
+export const defaultStatusNumbers : { [key in ErrorKey]: number } = {
+  "BadRequestError": 400,
+  "UnauthorizedError": 401,
+  "ForbiddenError": 403,
+  "NotFoundError": 404,
+  "MethodNotAllowedError": 405,
+  "InternalServerError": 500,
+  "BadGatewayError": 502,
+  "PublishError": 500,
+};
 
 function contentType(body: any) {
   return (typeof body === "string")
@@ -12,6 +25,17 @@ export function status(status: number, body?: string | object) : Response {
     body,
     contentType: contentType(body)
   }
+}
+
+export function errorResponse(i18nPrefix: string) : (err: Error) => Response {
+  return (err: Error) => {
+    const i18nKey = `${i18nPrefix}.${err.errorKey}`;
+
+    return status(defaultStatusNumbers[err.errorKey], {
+      message: getOrElse(() => i18nKey)(localize({ key: i18nKey })),
+      debug: String(err)
+    });
+  };
 }
 
 export const ok = (body: any) => status(200, body);
