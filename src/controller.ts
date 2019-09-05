@@ -27,13 +27,13 @@ export function status(status: number, body?: string | object) : Response {
   }
 }
 
-export function errorResponse(i18nPrefix: string) : (err: Error) => Response {
+export function errorResponse(i18nPrefix: string, debug: boolean = false) : (err: Error) => Response {
   return (err: Error) => {
     const i18nKey = `${i18nPrefix}.${err.errorKey}`;
 
     return status(defaultStatusNumbers[err.errorKey], {
       message: getOrElse(() => i18nKey)(localize({ key: i18nKey })),
-      debug: String(err)
+      cause: debug ? err.cause : undefined
     });
   };
 }
