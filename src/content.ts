@@ -59,7 +59,7 @@ export function createAndPublish<A>(params: CreateContentParams<A>) : Either<Err
   );
 }
 
-export function deleteAndPublish(params: DeleteContentParams) : Either<Error, boolean> {
+export function deleteAndPublish(params: DeleteContentParams) : Either<Error, void> {
   return pipe(
     runInDraftContext(remove)(params),
     chain(publishContentByKey(params.key))

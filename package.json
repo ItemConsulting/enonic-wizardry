@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/ItemConsulting/enonic-wizardry#readme",
   "dependencies": {
-    "enonic-fp": "^0.0.9",
+    "enonic-fp": "^0.0.10",
     "fp-ts": "^2.0.5"
   },
   "devDependencies": {
