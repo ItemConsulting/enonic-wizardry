@@ -13,6 +13,10 @@ import {
 } from "enonic-fp/lib/content";
 import {runInDraftContext} from './context';
 
+export interface WithId {
+  _id: string
+}
+
 export function publishFromDraftToMaster<A>(content: Content<A>) : Either<Error, Content<A>> {
   return pipe(
     publish({
@@ -71,4 +75,10 @@ export function modifyAndPublish<A>(key: string, changes: any) : Either<Error, C
     runInDraftContext(modify)(applyChangesToData<A>(key, changes)),
     chain(publishFromDraftToMaster)
   );
+}
+
+export function getContentDataWithId<T>(content: Content<T>) : T & WithId {
+  const dataWithId = content.data as T & WithId;
+  dataWithId._id = content._id;
+  return dataWithId;
 }
