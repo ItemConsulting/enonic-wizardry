@@ -24,8 +24,11 @@
   },
   "homepage": "https://github.com/ItemConsulting/enonic-wizardry#readme",
   "dependencies": {
+    "@types/node": "^12.7.4",
     "enonic-fp": "^0.0.10",
-    "fp-ts": "^2.0.5"
+    "fp-ts": "^2.0.5",
+    "xmldom": "^0.1.27",
+    "xpath": "0.0.27"
   },
   "devDependencies": {
     "rimraf": "^3.0.0",
