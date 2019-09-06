@@ -7,7 +7,8 @@
   "typings": "lib/index.d.ts",
   "scripts": {
     "clean": "rimraf lib/* es6/*",
-    "build": "npm run clean && tsc && tsc -p tsconfig.es6.json"
+    "build": "npm run clean && tsc && tsc -p tsconfig.es6.json && npm run build:cli",
+    "build:cli": "tsc -outDir bin cli/xml-to-ts.ts"
   },
   "repository": {
     "type": "git",
