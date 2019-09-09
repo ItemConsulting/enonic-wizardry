@@ -1,12 +1,14 @@
 import * as xmldom from "xmldom";
-import { evaluate, mapXpathResult, flatmapXpathResult } from "./xpathutils";
+import { evaluate, flatmapXpathResult, mapXpathResult } from "./xpathutils";
 const xpath = require("xpath");
+
+export const MissingFieldNameError = "A field is missing a name attribute";
 
 /**
  * createInterface parses an xml string and generates code for a TypeScript interface.
  */
 export function createInterface(interfaceName: string, xml: string): string {
-  return interfacefmt(parseXML(interfaceName, xml));
+  return formatInterface(parseXML(interfaceName, xml));
 }
 
 export interface GeneratedInterface {
@@ -23,24 +25,24 @@ export interface GeneratedField {
   subfields?: GeneratedField[];
 }
 
-function interfacefmt(iface: GeneratedInterface): string {
-  const fields = iface.fields.map(f => fieldfmt(f)).join("\n");
+function formatInterface(iface: GeneratedInterface): string {
+  const fields = iface.fields.map(f => formatField(f)).join("\n");
   return `export interface ${iface.name} {\n${fields}\n};\n`;
 }
 
-function fieldfmt(f: GeneratedField, indentation: string = "  "): string {
-  const optional = f.optional ? "?" : "";
-  const comment = f.comment ? commentfmt(f.comment, indentation) : "";
+function formatField(field: GeneratedField, indentation: string = "  "): string {
+  const optional = field.optional ? "?" : "";
+  const comment = field.comment ? formatComment(field.comment, indentation) : "";
   const subfields =
-    f.subfields && f.subfields.length > 0
+    field.subfields && field.subfields.length > 0
       ? `<{
-${f.subfields.map(f => fieldfmt(f, indentation + "  ")).join("\n")}
+${field.subfields.map(f => formatField(f, indentation + "  ")).join("\n")}
 ${indentation}}>`
       : "";
-  return `${comment}${indentation}${f.name}${optional}: ${f.type}${subfields}`;
+  return `${comment}${indentation}${field.name}${optional}: ${field.type}${subfields}`;
 }
 
-function commentfmt(comment: string, indentation: string): string {
+function formatComment(comment: string, indentation: string): string {
   comment = comment.replace("\n", `\n${indentation} * `);
   return (
     `\n` +
@@ -84,6 +86,7 @@ function getItemSetFields(node: Node): GeneratedField[] {
     itemSets,
     (node: Node): GeneratedField => {
       const nameAttr = xpath.select1("@name", node);
+
       const minimumOccurrencesAttr = xpath.select1(
         "./occurrences/@minimum",
         node
@@ -92,7 +95,7 @@ function getItemSetFields(node: Node): GeneratedField[] {
       const name = nameAttr ? nameAttr.value : "invalidName";
       const type = "Array";
       const optional = minimumOccurrencesAttr
-        ? minimumOccurrencesAttr.value == 0
+        ? minimumOccurrencesAttr.value === "0"
         : true;
 
       const items = evaluate("./items", node).iterateNext();
@@ -109,12 +112,16 @@ function getItemSetFields(node: Node): GeneratedField[] {
 
 function createFieldFromInput(input: Node): GeneratedField {
   const nameAttr = xpath.select1("@name", input);
+  if (!nameAttr) {
+    throw MissingFieldNameError;
+  }
+
   const minimumOccurrencesAttr = xpath.select1("./occurrences/@minimum", input);
 
   const name = nameAttr ? nameAttr.value : "invalidName";
   const comment = xpath.select1("string(./label)", input);
   const optional = minimumOccurrencesAttr
-    ? minimumOccurrencesAttr.value == 0
+    ? minimumOccurrencesAttr.value === "0"
     : true;
   const type = "string";
   return { name, type, comment, optional };

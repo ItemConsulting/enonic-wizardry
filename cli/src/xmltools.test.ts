@@ -156,8 +156,9 @@ describe("parseXML", () => {
   });
 
   test("parses inputs with missing name", () => {
-    const tsInterface = xmltools.parseXML("Employee", xml.simpleMissingName);
-    expect(tsInterface.fields[0].name).toBe("invalidName");
+    expect(() => {
+      xmltools.parseXML("Employee", xml.simpleMissingName);
+    }).toThrow();
   });
 
   test("parses inputs with missing comment", () => {
@@ -180,7 +181,6 @@ describe("parseXML", () => {
 
   test("parses ItemSets as a nested structure", () => {
     const tsInterface = xmltools.parseXML("Employee", xml.itemSet);
-    console.log(JSON.stringify(tsInterface));
     expect(tsInterface.fields.length).toBe(1);
     expect(tsInterface.fields[0].subfields.length).toBe(3);
     expect(tsInterface.fields[0].subfields[2].subfields.length).toBe(1);

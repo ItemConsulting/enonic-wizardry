@@ -1,7 +1,10 @@
-import * as fs from "fs";
 import { pascalCase } from "change-case";
+import * as commander from "commander";
+import * as fs from "fs";
 import * as path from "path";
 import * as xmltools from "./src/xmltools";
+
+const STDOUT_FILENO = 1; // standard output file descriptor
 
 export function generateInterface(filename: string): string {
   const interfaceName = path.basename(
@@ -16,49 +19,78 @@ function openTsFile(filename: string, flags: string): number {
   return fs.openSync(filename, flags);
 }
 
-// checks params for flag and mutates argv
-function shouldWriteToFile(argv: string[]): boolean {
-  const argIndex = argv.indexOf("--write-to-file");
-  if (argIndex === -1) {
-    return false;
+// XML-files in these directories will generate TypeScript interfaces when
+// using the --enonic-xml flag.
+const directories = [
+  "./src/main/resources/site/site.xml",
+  "./src/main/resources/site/content-types",
+  "./src/main/resources/site/parts",
+  "./src/main/resources/site/pages"
+];
+
+function getEnonicXmlFiles() {
+  const files = [];
+  for (let dir of directories) {
+    dir = path.resolve(dir);
+    if (!fs.existsSync(dir)) {
+      continue;
+    }
+
+    const stat = fs.statSync(dir);
+    if (stat.isFile()) {
+      files.push(dir);
+    } else if (stat.isDirectory()) {
+      files.push(...fs.readdirSync(dir).map(filename => dir + filename));
+    }
   }
-  argv.splice(argIndex, 1);
-  return true;
+  return files;
 }
 
-// show help if flag is set
-function showHelp(argv: string[]) {
-  if (argv.includes("--help") || argv.includes("-h")) {
-    console.error(usage);
-    process.exit(1);
-  }
+function exit(message: string) {
+  console.error(message);
+  process.exit(1);
 }
 
 function command(argv: string[]) {
-  showHelp(argv);
-  const writeToFile = shouldWriteToFile(argv);
+  const cmd = new commander.Command();
 
-  if (argv.length < 3) {
-    console.error(usage);
-    process.exit(1);
+  cmd
+    .option("--enonic-xml", "Use the default Enonic XML-files")
+    .option("--write-to-file", "Write to .ts files instead of to stdout")
+    .command("<cmd> [options] [files...]");
+
+  cmd.parse(argv);
+
+  const writeToFile = cmd.writeToFile === true;
+
+  const files = cmd.enonicXml ? getEnonicXmlFiles() : cmd.args;
+  if (files.length === 0) {
+    exit("No files");
   }
 
-  for (const filename of argv.slice(2)) {
-    const ts = generateInterface(filename);
-    let buf = Buffer.from(ts, "utf8");
+  const notFiles = files.filter(f => !fs.existsSync(f));
+  if (notFiles.length > 0) {
+    const fileList = notFiles.map(f => `  - ${f}`).join("\n");
+    exit(`Files do not exist: \n${fileList}`);
+  }
 
-    let output = !writeToFile ? 1 : openTsFile(filename, "w+"); // Write to stdout by default.
-    fs.writeSync(output, buf);
-    if (writeToFile) {
-      fs.closeSync(output);
+  for (const filename of files) {
+    try {
+      const ts = generateInterface(filename);
+      const buf = Buffer.from(ts, "utf8");
+
+      const output = !writeToFile ? STDOUT_FILENO : openTsFile(filename, "w+");
+      fs.writeSync(output, buf);
+      if (writeToFile) {
+        fs.closeSync(output);
+      }
+    } catch (err) {
+      if (err === xmltools.MissingFieldNameError) {
+        exit(`${filename}: ${err}`);
+      }
+      throw err;
     }
   }
 }
-
-const usage = `Usage: cmd [flags] xmlfile ...
-
-Flags:
-  --write-to-file     write the file to a .ts file of the same name
-`;
 
 command(process.argv);
