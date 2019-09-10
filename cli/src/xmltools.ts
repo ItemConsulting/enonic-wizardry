@@ -92,7 +92,7 @@ function getItemSetFields(node: Node): GeneratedField[] {
         node
       );
 
-      const name = nameAttr ? nameAttr.value : "invalidName";
+      const name = nameAttr.value;
       const type = "Array";
       const optional = minimumOccurrencesAttr
         ? minimumOccurrencesAttr.value === "0"
@@ -118,7 +118,7 @@ function createFieldFromInput(input: Node): GeneratedField {
 
   const minimumOccurrencesAttr = xpath.select1("./occurrences/@minimum", input);
 
-  const name = nameAttr ? nameAttr.value : "invalidName";
+  const name = nameAttr.value;
   const comment = xpath.select1("string(./label)", input);
   const optional = minimumOccurrencesAttr
     ? minimumOccurrencesAttr.value === "0"
