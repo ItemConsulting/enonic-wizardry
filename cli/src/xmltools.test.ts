@@ -129,7 +129,57 @@ const xml = {
     </items>
   </field-set>
 </form>
-</content-type>\n`
+</content-type>\n`,
+
+  minimalSite: `<site>
+  <form/>
+</site>`,
+
+  simpleSite: `<site>
+  <processors> 
+    <response-processor name="tracker" order="10"/>  
+  </processors>
+  <mappings> 
+     <mapping controller="/site/foobar/api.js" order="10">
+       <pattern>/api/v\d+/.*</pattern>
+     </mapping>
+     <mapping controller="/site/pages/default/default.js">
+       <match>type:'portal:fragment'</match>
+     </mapping>
+   </mappings>
+   <form> 
+    <input type="TextLine" name="company">
+      <label>Company</label>
+      <occurrences minimum="1" maximum="1"/>
+    </input>
+  </form>
+  <x-data name="seo-settings"/> 
+</site>`,
+
+  simplePage: `<page>
+  <display-name i18n="component.page.name">My first page</display-name>
+  <description>Front page of our site</description>
+  <form>
+    <input type="TextLine" name="pageName">
+      <label>Page Name</label>
+      <occurrences minimum="1" maximum="1"/>
+    </input>
+  </form>
+  <regions>
+    <region name="main"/>
+  </regions>
+</page>`,
+
+  simplePart: `<part>
+  <display-name i18n="employeeForm.displayName">Employee Form</display-name>
+  <description i18n="employeeForm.description">Edit the information of an employee</description>
+  <form>
+    <input type="TextLine" name="partPart">
+      <label>Part of a part</label>
+      <occurrences minimum="0" maximum="10"/>
+    </input>
+  </form>
+</part>`
 };
 
 describe("parseXML", () => {
@@ -184,5 +234,44 @@ describe("parseXML", () => {
     expect(tsInterface.fields.length).toBe(1);
     expect(tsInterface.fields[0].subfields.length).toBe(3);
     expect(tsInterface.fields[0].subfields[2].subfields.length).toBe(1);
+  });
+
+  test("parses the minimal site", () => {
+    const tsInterface = xmltools.parseXML("MySite", xml.minimalSite);
+    expect(tsInterface.name).toBe("MySite");
+    expect(tsInterface.fields).toHaveLength(0);
+  });
+
+  test("parses a simple site", () => {
+    const tsInterface = xmltools.parseXML("MySite", xml.simpleSite);
+    expect(tsInterface.name).toBe("MySite");
+    expect(tsInterface.fields).toHaveLength(1);
+
+    const field = tsInterface.fields[0];
+    expect(field.name).toBe("company");
+    expect(field.comment).toBe("Company");
+    expect(field.optional).toBe(false);
+  });
+
+  test("parses a simple page", () => {
+    const tsInterface = xmltools.parseXML("MyPage", xml.simplePage);
+    expect(tsInterface.name).toBe("MyPage");
+    expect(tsInterface.fields).toHaveLength(1);
+
+    const field = tsInterface.fields[0];
+    expect(field.name).toBe("pageName");
+    expect(field.optional).toBe(false);
+    expect(field.comment).toBe("Page Name");
+  });
+
+  test("parses a simple part", () => {
+    const tsInterface = xmltools.parseXML("SevenElevenWasAPartTimeJob", xml.simplePart);
+    expect(tsInterface.name).toBe("SevenElevenWasAPartTimeJob");
+    expect(tsInterface.fields).toHaveLength(1);
+
+    const field = tsInterface.fields[0];
+    expect(field.name).toBe("partPart");
+    expect(field.optional).toBe(true);
+    expect(field.comment).toBe("Part of a part");
   });
 });
