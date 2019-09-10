@@ -1,3 +1,5 @@
+import { pascalCase } from "change-case";
+import * as path from "path";
 import * as xmldom from "xmldom";
 import { evaluate, flatmapXpathResult, mapXpathResult } from "./xpathutils";
 const xpath = require("xpath");
@@ -9,6 +11,14 @@ export const MissingFieldNameError = "A field is missing a name attribute";
  */
 export function createInterface(interfaceName: string, xml: string): string {
   return formatInterface(parseXML(interfaceName, xml));
+}
+
+/**
+ * generateInterfaceName generates a name for a TypeScript interface from a filename.
+ * @param filename
+ */
+export function generateInterfaceName(filename: string): string {
+  return pascalCase(path.basename(filename, path.extname(filename)));
 }
 
 export interface GeneratedInterface {
@@ -26,17 +36,22 @@ export interface GeneratedField {
 }
 
 function formatInterface(iface: GeneratedInterface): string {
-  const fields = iface.fields.map(f => formatField(f)).join("\n");
+  const fields = iface.fields.map(f => formatField(f)).join("\n\n");
   return `export interface ${iface.name} {\n${fields}\n};\n`;
 }
 
-function formatField(field: GeneratedField, indentation: string = "  "): string {
+function formatField(
+  field: GeneratedField,
+  indentation: string = "  "
+): string {
   const optional = field.optional ? "?" : "";
-  const comment = field.comment ? formatComment(field.comment, indentation) : "";
+  const comment = field.comment
+    ? formatComment(field.comment, indentation)
+    : "";
   const subfields =
     field.subfields && field.subfields.length > 0
       ? `<{
-${field.subfields.map(f => formatField(f, indentation + "  ")).join("\n")}
+${field.subfields.map(f => formatField(f, indentation + "  ")).join("\n\n")}
 ${indentation}}>`
       : "";
   return `${comment}${indentation}${field.name}${optional}: ${field.type}${subfields}`;
@@ -45,7 +60,6 @@ ${indentation}}>`
 function formatComment(comment: string, indentation: string): string {
   comment = comment.replace("\n", `\n${indentation} * `);
   return (
-    `\n` +
     `${indentation}/**\n` +
     `${indentation} * ${comment}\n` +
     `${indentation} */\n`
@@ -55,14 +69,18 @@ function formatComment(comment: string, indentation: string): string {
 export function parseXML(name: string, xml: string): GeneratedInterface {
   const doc = new xmldom.DOMParser().parseFromString(xml);
   const form: Node = evaluate("//form", doc).iterateNext();
-  return {
-    name,
-    fields: [
-      ...getInputFields(form),
-      ...getFieldSetItems(form),
-      ...getItemSetFields(form)
-    ]
-  };
+  return { name, fields: parseForm(form) };
+}
+
+function parseForm(form: Node): GeneratedField[] {
+  if (!form) {
+    return [];
+  }
+  return [
+    ...getInputFields(form),
+    ...getFieldSetItems(form),
+    ...getItemSetFields(form)
+  ];
 }
 
 function getInputFields(node: Node): GeneratedField[] {

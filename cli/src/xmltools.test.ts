@@ -179,6 +179,11 @@ const xml = {
       <occurrences minimum="0" maximum="10"/>
     </input>
   </form>
+</part>`,
+
+  missingForm: `<part>
+  <display-name i18n="groupForm.displayName">Group form</display-name>
+  <description i18n="groupForm.description">Edit description about tahe group</description>
 </part>`
 };
 
@@ -197,6 +202,11 @@ describe("parseXML", () => {
     const tsInterface = xmltools.parseXML("Employee", xml.simple);
     expect(tsInterface.fields[0].name).toBe("firstName");
     expect(tsInterface.fields[1].name).toBe("lastName");
+  });
+
+  test("parses no form as 0 fields", () => {
+    const tsInterface = xmltools.parseXML("Employee", xml.missingForm);
+    expect(tsInterface.fields).toHaveLength(0);
   });
 
   test("parses optional inputs", () => {
@@ -219,7 +229,10 @@ describe("parseXML", () => {
   test("parses optional inputs with missing occurrences", () => {
     // Occurences defaults to minimum=0, maximum=1
     // See: https://developer.enonic.com/docs/xp/stable/cms/schemas#input_types
-    const tsInterface = xmltools.parseXML("Employee", xml.simpleMissingOccurrences);
+    const tsInterface = xmltools.parseXML(
+      "Employee",
+      xml.simpleMissingOccurrences
+    );
     expect(tsInterface.fields[0].optional).toBe(true);
     expect(tsInterface.fields[1].optional).toBe(true);
   });
@@ -265,7 +278,10 @@ describe("parseXML", () => {
   });
 
   test("parses a simple part", () => {
-    const tsInterface = xmltools.parseXML("SevenElevenWasAPartTimeJob", xml.simplePart);
+    const tsInterface = xmltools.parseXML(
+      "SevenElevenWasAPartTimeJob",
+      xml.simplePart
+    );
     expect(tsInterface.name).toBe("SevenElevenWasAPartTimeJob");
     expect(tsInterface.fields).toHaveLength(1);
 
@@ -273,5 +289,31 @@ describe("parseXML", () => {
     expect(field.name).toBe("partPart");
     expect(field.optional).toBe(true);
     expect(field.comment).toBe("Part of a part");
+  });
+});
+
+describe("generateInterfaceName", () => {
+  test("sets the interface name in PascalCase", () => {
+    const filenames = [
+      "my_little_interface",
+      "myLittleInterface",
+      "my-little-interface"
+    ];
+    for (var filename of filenames) {
+      const iname = xmltools.generateInterfaceName(filename);
+      expect(iname).toBe("MyLittleInterface");
+    }
+  });
+
+  test("drops the file extension", () => {
+    const filename = "my-little-interface.xml";
+    const iname = xmltools.generateInterfaceName(filename);
+    expect(iname).toBe("MyLittleInterface");
+  });
+
+  test("drops the file path", () => {
+    const filename = "/path/to/my-little-interface.xml";
+    const iname = xmltools.generateInterfaceName(filename);
+    expect(iname).toBe("MyLittleInterface");
   });
 });

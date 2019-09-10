@@ -1,4 +1,3 @@
-import { pascalCase } from "change-case";
 import * as commander from "commander";
 import { flatten } from "fp-ts/lib/Array";
 import * as fs from "fs";
@@ -7,10 +6,8 @@ import * as xmltools from "./src/xmltools";
 
 const STDOUT_FILENO = 1; // standard output file descriptor
 
-export function generateInterface(filename: string): string {
-  const interfaceName = path.basename(
-    pascalCase(filename.substring(0, filename.lastIndexOf(".")))
-  );
+function generateInterface(filename: string): string {
+  const interfaceName = xmltools.generateInterfaceName(filename);
   const xml = fs.readFileSync(filename, "utf-8");
   return xmltools.createInterface(interfaceName, xml);
 }
@@ -78,15 +75,14 @@ function command(argv: string[]) {
       "Generate all xml files for the specified Enonic project"
     )
     .option("--write-to-file", "Write to .ts files instead of to stdout")
+    .option("-v|--verbose")
     .command("<cmd> [options] [files...]");
 
   cmd.parse(argv);
 
   const writeToFile = cmd.writeToFile === true;
 
-  const files = cmd.project
-    ? getEnonicXmlFiles(cmd.project)
-    : cmd.args;
+  const files = cmd.project ? getEnonicXmlFiles(cmd.project) : cmd.args;
   if (files.length === 0) {
     exit("No files");
   }
@@ -98,6 +94,9 @@ function command(argv: string[]) {
   }
 
   for (const filename of files) {
+    if (cmd.verbose) {
+      console.error(filename);
+    }
     try {
       const ts = generateInterface(filename);
       const buf = Buffer.from(ts, "utf8");
