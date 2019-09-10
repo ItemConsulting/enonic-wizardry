@@ -1,5 +1,6 @@
 import { pascalCase } from "change-case";
 import * as commander from "commander";
+import { flatten } from "fp-ts/lib/Array";
 import * as fs from "fs";
 import * as path from "path";
 import * as xmltools from "./src/xmltools";
@@ -22,15 +23,16 @@ function openTsFile(filename: string, flags: string): number {
 // XML-files in these directories will generate TypeScript interfaces when
 // using the --enonic-xml flag.
 const directories = [
-  "./src/main/resources/site/site.xml",
-  "./src/main/resources/site/content-types",
-  "./src/main/resources/site/parts",
-  "./src/main/resources/site/pages"
+  "src/main/resources/site/site.xml",
+  "src/main/resources/site/content-types",
+  "src/main/resources/site/parts",
+  "src/main/resources/site/pages"
 ];
 
-function getEnonicXmlFiles() {
+function getEnonicXmlFiles(projectRootDir: string): string[] {
   const files = [];
-  for (let dir of directories) {
+  const dirs = directories.map(dir => path.join(projectRootDir, dir));
+  for (let dir of dirs) {
     dir = path.resolve(dir);
     if (!fs.existsSync(dir)) {
       continue;
@@ -40,10 +42,26 @@ function getEnonicXmlFiles() {
     if (stat.isFile()) {
       files.push(dir);
     } else if (stat.isDirectory()) {
-      files.push(...fs.readdirSync(dir).map(filename => dir + filename));
+      files.push(...listXmlFiles(dir));
     }
   }
   return files;
+}
+
+function listXmlFiles(dir: string): string[] {
+  return listFiles(dir).filter(f => path.extname(f) === ".xml");
+}
+
+function listFiles(dir: string): string[] {
+  const dirContents = fs.readdirSync(dir);
+  const files = dirContents
+    .map(f => path.join(dir, f))
+    .filter(f => fs.statSync(f).isFile());
+  const subdirFiles = dirContents
+    .map(f => path.join(dir, f))
+    .filter(f => fs.statSync(f).isDirectory())
+    .map(listFiles);
+  return [...files, ...flatten(subdirFiles)];
 }
 
 function exit(message: string) {
@@ -55,7 +73,10 @@ function command(argv: string[]) {
   const cmd = new commander.Command();
 
   cmd
-    .option("--enonic-xml", "Use the default Enonic XML-files")
+    .option(
+      "--project <dir>",
+      "Generate all xml files for the specified Enonic project"
+    )
     .option("--write-to-file", "Write to .ts files instead of to stdout")
     .command("<cmd> [options] [files...]");
 
@@ -63,7 +84,9 @@ function command(argv: string[]) {
 
   const writeToFile = cmd.writeToFile === true;
 
-  const files = cmd.enonicXml ? getEnonicXmlFiles() : cmd.args;
+  const files = cmd.project
+    ? getEnonicXmlFiles(cmd.project)
+    : cmd.args;
   if (files.length === 0) {
     exit("No files");
   }
