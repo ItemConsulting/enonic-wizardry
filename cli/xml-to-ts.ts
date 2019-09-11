@@ -6,15 +6,33 @@ import * as xmltools from "./src/xmltools";
 
 const STDOUT_FILENO = 1; // standard output file descriptor
 
-function generateInterface(filename: string): string {
-  const interfaceName = xmltools.generateInterfaceName(filename);
-  const xml = fs.readFileSync(filename, "utf-8");
+function generateInterface(xmlFilename: string, tsFilename: string) {
+  const interfaceName = xmltools.generateInterfaceName(tsFilename);
+  const xml = fs.readFileSync(xmlFilename, "utf-8");
   return xmltools.createInterface(interfaceName, xml);
 }
 
-function openTsFile(filename: string, flags: string): number {
-  filename = filename.substring(0, filename.lastIndexOf(".")) + ".ts";
-  return fs.openSync(filename, flags);
+// map<directory, suffix>
+const directorySuffix = {
+  parts: "-part-config",
+  pages: "-page-config",
+  site: "-config"
+};
+
+// tries to avoid conflicting filenames
+function getTsFilename(filename: string): string {
+  const dirname = path.dirname(filename);
+  const basename = path.basename(filename, path.extname(filename));
+
+  const closestDir = path
+    .dirname(filename)
+    .split(path.sep)
+    .reverse()
+    .slice(0, 2)
+    .find(p => directorySuffix[p]);
+  const suffix = directorySuffix[closestDir] || "";
+
+  return `${dirname}/${basename}${suffix}.ts`;
 }
 
 // XML-files in these directories will generate TypeScript interfaces when
@@ -93,22 +111,28 @@ function command(argv: string[]) {
     exit(`Files do not exist: \n${fileList}`);
   }
 
-  for (const filename of files) {
+  for (const xmlFilename of files) {
     if (cmd.verbose) {
-      console.error(filename);
+      console.error(xmlFilename);
     }
     try {
-      const ts = generateInterface(filename);
+      const tsFilename = cmd.project
+        ? getTsFilename(xmlFilename)
+        : path.basename(xmlFilename, path.extname(xmlFilename)) + ".ts";
+
+      const ts = generateInterface(xmlFilename, tsFilename);
       const buf = Buffer.from(ts, "utf8");
 
-      const output = !writeToFile ? STDOUT_FILENO : openTsFile(filename, "w+");
+      const output = !writeToFile
+        ? STDOUT_FILENO
+        : fs.openSync(tsFilename, "w+");
       fs.writeSync(output, buf);
       if (writeToFile) {
         fs.closeSync(output);
       }
     } catch (err) {
       if (err === xmltools.MissingFieldNameError) {
-        exit(`${filename}: ${err}`);
+        exit(`${xmlFilename}: ${err}`);
       }
       throw err;
     }
