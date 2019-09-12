@@ -1,10 +1,7 @@
 import * as commander from "commander";
-import { flatten } from "fp-ts/lib/Array";
 import * as fs from "fs";
 import * as path from "path";
 import * as xmltools from "./src/xmltools";
-
-const STDOUT_FILENO = 1; // standard output file descriptor
 
 function generateInterface(xmlFilename: string, tsFilename: string) {
   const interfaceName = xmltools.generateInterfaceName(tsFilename);
@@ -13,7 +10,7 @@ function generateInterface(xmlFilename: string, tsFilename: string) {
 }
 
 // map<directory, suffix>
-const directorySuffix : {[key: string]: string} = {
+const directorySuffix: { [key: string]: string } = {
   parts: "-part-config",
   pages: "-page-config",
   site: "-config"
@@ -24,7 +21,7 @@ function getTsFilename(filename: string): string {
   const dirname = path.dirname(filename);
   const basename = path.basename(filename, path.extname(filename));
 
-  const closestDir = path
+  const closestDir: string = path
     .dirname(filename)
     .split(path.sep)
     .reverse()
@@ -33,6 +30,14 @@ function getTsFilename(filename: string): string {
   const suffix = directorySuffix[closestDir] || "";
 
   return `${dirname}/${basename}${suffix}.ts`;
+}
+
+function replaceFileExtension(
+  newExtension: string
+): (filename: string) => string {
+  return filename =>
+    filename.substring(0, filename.length - path.extname(filename).length) +
+    newExtension;
 }
 
 // XML-files in these directories will generate TypeScript interfaces when
@@ -44,39 +49,45 @@ const directories = [
   "src/main/resources/site/pages"
 ];
 
-function getEnonicXmlFiles(projectRootDir: string): string[] {
-  const files = [];
-  const dirs = directories.map(dir => path.join(projectRootDir, dir));
-  for (let dir of dirs) {
-    dir = path.resolve(dir);
-    if (!fs.existsSync(dir)) {
-      continue;
-    }
-
-    const stat = fs.statSync(dir);
-    if (stat.isFile()) {
-      files.push(dir);
-    } else if (stat.isDirectory()) {
-      files.push(...listXmlFiles(dir));
-    }
-  }
-  return files;
+function getEnonicXmlFiles(projectRootDir: string): Array<string> {
+  return directories
+    .map(dir => path.join(projectRootDir, dir))
+    .map(dir => path.resolve(dir))
+    .filter(dir => fs.existsSync(dir))
+    .reduce((result: Array<string>, dir: string) => {
+      const stat = fs.statSync(dir);
+      return result
+        .concat(stat.isFile() ? [dir] : [])
+        .concat(stat.isDirectory() ? listXmlFiles(dir) : []);
+    }, []);
 }
 
-function listXmlFiles(dir: string): string[] {
+function listXmlFiles(dir: string): Array<string> {
   return listFiles(dir).filter(f => path.extname(f) === ".xml");
 }
 
-function listFiles(dir: string): string[] {
-  const dirContents = fs.readdirSync(dir);
-  const files = dirContents
-    .map(f => path.join(dir, f))
-    .filter(f => fs.statSync(f).isFile());
-  const subdirFiles = dirContents
-    .map(f => path.join(dir, f))
-    .filter(f => fs.statSync(f).isDirectory())
-    .map(listFiles);
-  return [...files, ...flatten(subdirFiles)];
+function listFiles(dir: string): Array<string> {
+  return fs
+    .readdirSync(dir)
+    .map(file => path.join(dir, file))
+    .reduce((result, dir) => {
+      const stat = fs.statSync(dir);
+      return result
+        .concat(stat.isFile() ? [dir] : [])
+        .concat(stat.isDirectory() ? listFiles(dir) : []);
+    }, []);
+}
+
+function consoleWriter(_: string): (output: string) => void {
+  return console.log;
+}
+
+function fileWriter(filename: string): (output: string) => void {
+  return (output: string) => {
+    const fd = fs.openSync(filename, "w+");
+    fs.writeSync(fd, Buffer.from(output, "utf8"));
+    fs.closeSync(fd);
+  };
 }
 
 function exit(message: string) {
@@ -84,7 +95,7 @@ function exit(message: string) {
   process.exit(1);
 }
 
-function command(argv: string[]) {
+function command(argv: Array<string>) {
   const cmd = new commander.Command();
 
   cmd
@@ -93,12 +104,13 @@ function command(argv: string[]) {
       "Generate all xml files for the specified Enonic project"
     )
     .option("--write-to-file", "Write to .ts files instead of to stdout")
-    .option("-v|--verbose")
+    .option("-v, --verbose")
     .command("<cmd> [options] [files...]");
 
   cmd.parse(argv);
 
-  const writeToFile = cmd.writeToFile === true;
+  const rename = cmd.project ? getTsFilename : replaceFileExtension(".ts");
+  const write = cmd.writeToFile ? fileWriter : consoleWriter;
 
   const files = cmd.project ? getEnonicXmlFiles(cmd.project) : cmd.args;
   if (files.length === 0) {
@@ -116,20 +128,9 @@ function command(argv: string[]) {
       console.error(xmlFilename);
     }
     try {
-      const tsFilename = cmd.project
-        ? getTsFilename(xmlFilename)
-        : path.basename(xmlFilename, path.extname(xmlFilename)) + ".ts";
-
-      const ts = generateInterface(xmlFilename, tsFilename);
-      const buf = Buffer.from(ts, "utf8");
-
-      const output = !writeToFile
-        ? STDOUT_FILENO
-        : fs.openSync(tsFilename, "w+");
-      fs.writeSync(output, buf);
-      if (writeToFile) {
-        fs.closeSync(output);
-      }
+      const tsFilename = rename(xmlFilename);
+      const tsInterface = generateInterface(xmlFilename, tsFilename);
+      write(tsFilename)(tsInterface);
     } catch (err) {
       if (err === xmltools.MissingFieldNameError) {
         exit(`${xmlFilename}: ${err}`);
