@@ -13,7 +13,7 @@ function generateInterface(xmlFilename: string, tsFilename: string) {
 }
 
 // map<directory, suffix>
-const directorySuffix = {
+const directorySuffix : {[key: string]: string} = {
   parts: "-part-config",
   pages: "-page-config",
   site: "-config"
