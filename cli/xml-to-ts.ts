@@ -27,9 +27,9 @@ function getTsFilename(filename: string): string {
     .reverse()
     .slice(0, 2)
     .find(p => directorySuffix[p]);
-  const suffix = directorySuffix[closestDir] || "";
+  const suffix = directorySuffix[closestDir];
 
-  return `${dirname}/${basename}${suffix}.ts`;
+  return `${dirname}/${basename}${suffix ? suffix : ""}.ts`;
 }
 
 function replaceFileExtension(
@@ -63,14 +63,14 @@ function getEnonicXmlFiles(projectRootDir: string): Array<string> {
 }
 
 function listXmlFiles(dir: string): Array<string> {
-  return listFiles(dir).filter(f => path.extname(f) === ".xml");
+  return listFiles(dir).filter(file => path.extname(file) === ".xml");
 }
 
 function listFiles(dir: string): Array<string> {
   return fs
     .readdirSync(dir)
     .map(file => path.join(dir, file))
-    .reduce((result, dir) => {
+    .reduce((result: Array<string>, dir) => {
       const stat = fs.statSync(dir);
       return result
         .concat(stat.isFile() ? [dir] : [])
@@ -117,9 +117,9 @@ function command(argv: Array<string>) {
     exit("No files");
   }
 
-  const notFiles = files.filter(f => !fs.existsSync(f));
+  const notFiles = files.filter(file => !fs.existsSync(file));
   if (notFiles.length > 0) {
-    const fileList = notFiles.map(f => `  - ${f}`).join("\n");
+    const fileList = notFiles.map(file => `  - ${file}`).join("\n");
     exit(`Files do not exist: \n${fileList}`);
   }
 
