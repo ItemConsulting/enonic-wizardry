@@ -62,7 +62,7 @@ export const badGateway = (body: any) =>  status(502, body);
 
 export function setTotal(total: number, response: Response) : Response {
   response.headers = {
-    'X-Total-Count': total
+    'X-Total-Count': String(total)
   };
   return response;
 }

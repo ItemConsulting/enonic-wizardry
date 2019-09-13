@@ -1,6 +1,6 @@
 {
   "name": "enonic-wizardry",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Functional utility library for Enonic XP",
   "main": "lib/index.js",
   "module": "es6/index.js",
@@ -30,7 +30,7 @@
     "@types/xmldom": "^0.1.29",
     "change-case": "^3.1.0",
     "commander": "^3.0.1",
-    "enonic-fp": "^0.0.10",
+    "enonic-fp": "^0.0.16",
     "fp-ts": "^2.0.5",
     "xmldom": "^0.1.27",
     "xpath": "0.0.27"
