@@ -6,9 +6,9 @@
   "module": "es6/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
-    "clean": "rimraf lib/* es6/*",
+    "clean": "rimraf lib/* es6/* bin/*",
     "build": "npm run clean && tsc && tsc -p tsconfig.es6.json && npm run build:cli",
-    "build:cli": "tsc -outDir bin cli/xml-to-ts.ts",
+    "build:cli": "tsc -p tsconfig.cli.json",
     "test": "jest",
     "watch:test": "jest --watch"
   },
@@ -27,7 +27,6 @@
   },
   "homepage": "https://github.com/ItemConsulting/enonic-wizardry#readme",
   "dependencies": {
-    "@types/xmldom": "^0.1.29",
     "change-case": "^3.1.0",
     "commander": "^3.0.1",
     "enonic-fp": "^0.0.16",
@@ -36,6 +35,7 @@
     "xpath": "0.0.27"
   },
   "devDependencies": {
+    "@types/xmldom": "^0.1.29",
     "@types/jest": "^24.0.18",
     "@types/node": "^12.7.4",
     "jest": "^24.9.0",
