@@ -19,7 +19,7 @@ export function mapXpathResult<A>(
 ): Array<A> {
   const result: Array<A> = [];
 
-  let input: Node = null;
+  let input: Node | null = null;
   while ((input = inputs.iterateNext())) {
     result.push(f(input));
   }
@@ -33,7 +33,7 @@ export function flatmapXpathResult<A>(
 ): Array<A> {
   const result: Array<A> = [];
 
-  let input: Node = null;
+  let input: Node | null = null;
   while ((input = inputs.iterateNext())) {
     const r = f(input);
     if (Array.isArray(r)) {

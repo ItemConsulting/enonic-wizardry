@@ -67,18 +67,16 @@ function formatComment(comment: string): string {
 
 export function parseXML(name: string, xml: string): GeneratedInterface {
   const doc = new xmldom.DOMParser().parseFromString(xml);
-  const form: Node = evaluate("//form", doc).iterateNext();
-  return { name, fields: parseForm(form) };
+  const form: Node | null = evaluate("//form", doc).iterateNext();
+  return { name, fields: form ? parseForm(form) : [] };
 }
 
 function parseForm(form: Node): Array<GeneratedField> {
-  return form
-    ? [
-        ...getInputFields(form),
-        ...getFieldSetItems(form),
-        ...getItemSetFields(form)
-      ]
-    : [];
+  return [
+    ...getInputFields(form),
+    ...getFieldSetItems(form),
+    ...getItemSetFields(form)
+  ];
 }
 
 function getInputFields(node: Node): Array<GeneratedField> {
@@ -117,11 +115,13 @@ function getItemSetFields(node: Node): Array<GeneratedField> {
         : true;
 
       const items = evaluate("./items", node).iterateNext();
-      const subfields = [
-        ...getInputFields(items),
-        ...getFieldSetItems(items),
-        ...getItemSetFields(items)
-      ];
+      const subfields = items
+        ? [
+            ...getInputFields(items),
+            ...getFieldSetItems(items),
+            ...getItemSetFields(items)
+          ]
+        : [];
 
       return { name, type, optional, subfields };
     }

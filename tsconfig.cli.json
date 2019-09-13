@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./bin"
+  },
+  "include": [
+    "cli/**/*"
+  ],
+  "files": [],
+  "exclude": ["**/*.test.js", "**/*.test.ts"]
+}

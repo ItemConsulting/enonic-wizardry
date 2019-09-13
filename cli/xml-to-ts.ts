@@ -21,15 +21,15 @@ function getTsFilename(filename: string): string {
   const dirname = path.dirname(filename);
   const basename = path.basename(filename, path.extname(filename));
 
-  const closestDir: string = path
+  const closestDir = path
     .dirname(filename)
     .split(path.sep)
     .reverse()
     .slice(0, 2)
     .find(p => directorySuffix[p]);
-  const suffix = directorySuffix[closestDir];
+  const suffix = closestDir ? directorySuffix[closestDir] : "";
 
-  return `${dirname}/${basename}${suffix ? suffix : ""}.ts`;
+  return `${dirname}/${basename}${suffix}.ts`;
 }
 
 function replaceFileExtension(
