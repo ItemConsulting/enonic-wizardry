@@ -3,10 +3,12 @@ import * as fs from "fs";
 import * as path from "path";
 import * as xmltools from "./src/xmltools";
 
+const generator = xmltools.NewInterfaceGenerator();
+
 function generateInterface(xmlFilename: string, tsFilename: string) {
   const interfaceName = xmltools.generateInterfaceName(tsFilename);
   const xml = fs.readFileSync(xmlFilename, "utf-8");
-  return xmltools.createInterface(interfaceName, xml);
+  return generator.createInterface(interfaceName, xml);
 }
 
 // map<directory, suffix>
@@ -48,6 +50,7 @@ const directories = [
   "src/main/resources/site/parts",
   "src/main/resources/site/pages"
 ];
+const mixinDir = "src/main/resources/site/mixins";
 
 function getEnonicXmlFiles(projectRootDir: string): Array<string> {
   return directories
@@ -95,19 +98,32 @@ function exit(message: string) {
   process.exit(1);
 }
 
+function collect<T>(next: T, prev: Array<T>) {
+  return prev.concat([next]);
+}
+
 function command(argv: Array<string>) {
   const cmd = new commander.Command();
 
   cmd
     .option(
       "--project <dir>",
-      "Generate all xml files for the specified Enonic project"
+      "generate all xml files for the specified Enonic project"
     )
-    .option("--write-to-file", "Write to .ts files instead of to stdout")
+    .option("--write-to-file", "write to .ts files instead of stdout")
     .option("-v, --verbose")
+    .option("--mixin <file>", "add a file as a mixin", collect, [])
     .command("<cmd> [options] [files...]");
 
   cmd.parse(argv);
+
+  const projectMixins = cmd.project ? listXmlFiles(path.join(cmd.project, mixinDir)) : [];
+  const mixinFiles = cmd.mixin.concat(projectMixins);
+
+  for (const filename of mixinFiles) {
+    const xml = fs.readFileSync(filename, "utf8");
+    generator.addMixin(filename, xml);
+  }
 
   const rename = cmd.project ? getTsFilename : replaceFileExtension(".ts");
   const write = cmd.writeToFile ? fileWriter : consoleWriter;

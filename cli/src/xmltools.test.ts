@@ -184,52 +184,89 @@ const xml = {
   missingForm: `<part>
   <display-name i18n="groupForm.displayName">Group form</display-name>
   <description i18n="groupForm.description">Edit description about tahe group</description>
-</part>`
+</part>`,
+
+  mixinUser: `<content-type>
+  <display-name>Using mixins</display-name>
+  <form>
+    <input type="TextLine" name="firstName">
+      <label>First Name</label>
+      <occurrences minimum="1" maximum="1"/>
+    </input>
+    <input type="TextLine" name="lastName">
+      <label>Last Name</label>
+      <occurrences minimum="1" maximum="1"/>
+    </input>
+    <mixin name="address"/>
+  </form>
+</content-type>`,
+
+  mixin: `<mixin>
+  <display-name>Full address</display-name>
+  <form>
+    <input type="TextLine" name="addressLine">
+      <label>Street address</label>
+      <occurrences minimum="0" maximum="2"/>
+    </input>
+    <input type="TextLine" name="city">
+      <label>City</label>
+      <occurrences minimum="1" maximum="1"/>
+    </input>
+    <input type="TextLine" name="zipCode">
+      <label>Zip code</label>
+      <occurrences minimum="1" maximum="1"/>
+    </input>
+    <input type="TextLine" name="country">
+      <label>Country</label>
+      <occurrences minimum="1" maximum="1"/>
+    </input>
+  </form>
+</mixin>`
 };
 
 describe("parseXML", () => {
   test("sets the name field", () => {
-    const tsInterface = xmltools.parseXML("Employee", xml.simple);
+    const tsInterface = xmltools.parseXml("Employee", xml.simple);
     expect(tsInterface.name).toBe("Employee");
   });
 
   test("parses all inputs", () => {
-    const tsInterface = xmltools.parseXML("Employee", xml.simple);
+    const tsInterface = xmltools.parseXml("Employee", xml.simple);
     expect(tsInterface.fields.length).toBe(2);
   });
 
   test("parses field names", () => {
-    const tsInterface = xmltools.parseXML("Employee", xml.simple);
+    const tsInterface = xmltools.parseXml("Employee", xml.simple);
     expect(tsInterface.fields[0].name).toBe("firstName");
     expect(tsInterface.fields[1].name).toBe("lastName");
   });
 
   test("parses no form as 0 fields", () => {
-    const tsInterface = xmltools.parseXML("Employee", xml.missingForm);
+    const tsInterface = xmltools.parseXml("Employee", xml.missingForm);
     expect(tsInterface.fields).toHaveLength(0);
   });
 
   test("parses optional inputs", () => {
-    const tsInterface = xmltools.parseXML("Employee", xml.simple);
+    const tsInterface = xmltools.parseXml("Employee", xml.simple);
     expect(tsInterface.fields[0].optional).toBe(false);
     expect(tsInterface.fields[1].optional).toBe(true);
   });
 
   test("parses inputs with missing name", () => {
     expect(() => {
-      xmltools.parseXML("Employee", xml.simpleMissingName);
+      xmltools.parseXml("Employee", xml.simpleMissingName);
     }).toThrow();
   });
 
   test("parses inputs with missing comment", () => {
-    const tsInterface = xmltools.parseXML("Employee", xml.simpleMissingComment);
+    const tsInterface = xmltools.parseXml("Employee", xml.simpleMissingComment);
     expect(tsInterface.fields[0].comment).toBe("");
   });
 
   test("parses optional inputs with missing occurrences", () => {
     // Occurences defaults to minimum=0, maximum=1
     // See: https://developer.enonic.com/docs/xp/stable/cms/schemas#input_types
-    const tsInterface = xmltools.parseXML(
+    const tsInterface = xmltools.parseXml(
       "Employee",
       xml.simpleMissingOccurrences
     );
@@ -238,25 +275,25 @@ describe("parseXML", () => {
   });
 
   test("parses FieldSets as a flat structure", () => {
-    const tsInterface = xmltools.parseXML("Employee", xml.fieldSet);
+    const tsInterface = xmltools.parseXml("Employee", xml.fieldSet);
     expect(tsInterface.fields.length).toBe(2);
   });
 
   test("parses ItemSets as a nested structure", () => {
-    const tsInterface = xmltools.parseXML("Employee", xml.itemSet);
+    const tsInterface = xmltools.parseXml("Employee", xml.itemSet);
     expect(tsInterface.fields.length).toBe(1);
     expect(tsInterface.fields[0].subfields.length).toBe(3);
     expect(tsInterface.fields[0].subfields[2].subfields.length).toBe(1);
   });
 
   test("parses the minimal site", () => {
-    const tsInterface = xmltools.parseXML("MySite", xml.minimalSite);
+    const tsInterface = xmltools.parseXml("MySite", xml.minimalSite);
     expect(tsInterface.name).toBe("MySite");
     expect(tsInterface.fields).toHaveLength(0);
   });
 
   test("parses a simple site", () => {
-    const tsInterface = xmltools.parseXML("MySite", xml.simpleSite);
+    const tsInterface = xmltools.parseXml("MySite", xml.simpleSite);
     expect(tsInterface.name).toBe("MySite");
     expect(tsInterface.fields).toHaveLength(1);
 
@@ -267,7 +304,7 @@ describe("parseXML", () => {
   });
 
   test("parses a simple page", () => {
-    const tsInterface = xmltools.parseXML("MyPage", xml.simplePage);
+    const tsInterface = xmltools.parseXml("MyPage", xml.simplePage);
     expect(tsInterface.name).toBe("MyPage");
     expect(tsInterface.fields).toHaveLength(1);
 
@@ -278,7 +315,7 @@ describe("parseXML", () => {
   });
 
   test("parses a simple part", () => {
-    const tsInterface = xmltools.parseXML(
+    const tsInterface = xmltools.parseXml(
       "SevenElevenWasAPartTimeJob",
       xml.simplePart
     );
@@ -289,6 +326,54 @@ describe("parseXML", () => {
     expect(field.name).toBe("partPart");
     expect(field.optional).toBe(true);
     expect(field.comment).toBe("Part of a part");
+  });
+
+  test("parses mixins", () => {
+    const tsInterface = xmltools.parseXml("MixinExample", xml.mixinUser);
+    const mixins = tsInterface.fields.filter(field => field.type === "mixin");
+    expect(mixins).toHaveLength(1);
+    expect(mixins[0].name).toBe("address");
+    expect(mixins[0].type).toBe("mixin");
+  });
+});
+
+describe("InterfaceGenerator", () => {
+  test("NewInterfaceGenerator creates a new InterfaceGenerator", () => {
+    const generator = xmltools.NewInterfaceGenerator();
+    expect(generator).toBeDefined();
+    expect(generator).not.toBeNull();
+  });
+
+  test("throws when no mixin exists", () => {
+    const generator = xmltools.NewInterfaceGenerator();
+    expect(() => {
+      generator.createInterface("MixedIn", xml.mixinUser);
+    }).toThrow();
+  });
+
+  test("generates the correct input code", () => {
+    const generator = xmltools.NewInterfaceGenerator();
+    const tsInterface = generator.createInterface("Simple", xml.simple);
+    expect(tsInterface).toMatchSnapshot();
+  });
+
+  test("generates the correct FieldSet code", () => {
+    const generator = xmltools.NewInterfaceGenerator();
+    const tsInterface = generator.createInterface("FieldSetUser", xml.fieldSet);
+    expect(tsInterface).toMatchSnapshot();
+  });
+
+  test("generates the correct ItemSet code", () => {
+    const generator = xmltools.NewInterfaceGenerator();
+    const tsInterface = generator.createInterface("ItemSetUser", xml.itemSet);
+    expect(tsInterface).toMatchSnapshot();
+  });
+
+  test("generates the correct mixin code", () => {
+    const generator = xmltools.NewInterfaceGenerator();
+    generator.addMixin("address", xml.mixin);
+    const tsInterface = generator.createInterface("MixedIn", xml.mixinUser);
+    expect(tsInterface).toMatchSnapshot();
   });
 });
 
