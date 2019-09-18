@@ -1,6 +1,6 @@
 {
   "name": "enonic-wizardry",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Functional utility library for Enonic XP",
   "main": "lib/index.js",
   "module": "es6/index.js",
