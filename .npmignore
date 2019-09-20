@@ -3,3 +3,4 @@ tsconfig.es6.json
 src
 .idea
 .editorconfig
+__snapshots__

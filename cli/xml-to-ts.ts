@@ -1,7 +1,7 @@
 import * as commander from "commander";
 import * as fs from "fs";
 import * as path from "path";
-import * as xmltools from "./src/xmltools";
+import * as xmltools from "./utils/xmltools";
 
 const generator = xmltools.NewInterfaceGenerator();
 
