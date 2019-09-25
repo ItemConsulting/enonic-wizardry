@@ -1,5 +1,5 @@
-import { Error } from "enonic-fp/lib/common";
-import { Either, map, chain } from "fp-ts/lib/Either";
+import { EnonicError } from "enonic-fp/lib/common";
+import { IOEither, map, chain } from "fp-ts/lib/IOEither";
 import { pipe } from "fp-ts/lib/pipeable";
 import {
   Content,
@@ -17,7 +17,7 @@ export interface WithId {
   _id: string
 }
 
-export function publishFromDraftToMaster<A>(content: Content<A>) : Either<Error, Content<A>> {
+export function publishFromDraftToMaster<A>(content: Content<A>) : IOEither<EnonicError, Content<A>> {
   return pipe(
     publish({
       keys: [content._id],
@@ -28,7 +28,7 @@ export function publishFromDraftToMaster<A>(content: Content<A>) : Either<Error,
   );
 }
 
-export function publishContentByKey<A>(key: string) : (a: A) => Either<Error, A> {
+export function publishContentByKey<A>(key: string) : (a: A) => IOEither<EnonicError, A> {
   return a => {
     return pipe(
       publish({
@@ -56,21 +56,21 @@ export function applyChangesToData<A>(key: string, changes: any) : ModifyContent
   };
 }
 
-export function createAndPublish<A>(params: CreateContentParams<A>) : Either<Error, Content<A>> {
+export function createAndPublish<A>(params: CreateContentParams<A>) : IOEither<EnonicError, Content<A>> {
   return pipe(
     runInDraftContext(create)(params),
     chain(publishFromDraftToMaster)
   );
 }
 
-export function deleteAndPublish(params: DeleteContentParams) : Either<Error, void> {
+export function deleteAndPublish(params: DeleteContentParams) : IOEither<EnonicError, void> {
   return pipe(
     runInDraftContext(remove)(params),
     chain(publishContentByKey(params.key))
   );
 }
 
-export function modifyAndPublish<A>(key: string, changes: any) : Either<Error, Content<A>> {
+export function modifyAndPublish<A>(key: string, changes: any) : IOEither<EnonicError, Content<A>> {
   return pipe(
     runInDraftContext(modify)(applyChangesToData<A>(key, changes)),
     chain(publishFromDraftToMaster)

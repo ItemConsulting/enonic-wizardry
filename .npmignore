@@ -1,6 +1,8 @@
 tsconfig.json
-tsconfig.es6.json
+tsconfig.cli.json
 src
+cli
 .idea
 .editorconfig
 __snapshots__
+jest.config.js

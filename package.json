@@ -1,13 +1,12 @@
 {
   "name": "enonic-wizardry",
-  "version": "0.0.8",
+  "version": "0.1.0-RC1",
   "description": "Functional utility library for Enonic XP",
   "main": "lib/index.js",
-  "module": "es6/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
-    "clean": "rimraf lib/* es6/* bin/*",
-    "build": "npm run clean && tsc && tsc -p tsconfig.es6.json && npm run build:cli",
+    "clean": "rimraf lib/* bin/*",
+    "build": "npm run clean && tsc && npm run build:cli",
     "build:cli": "tsc -p tsconfig.cli.json",
     "test": "jest",
     "watch:test": "jest --watch"
@@ -29,7 +28,7 @@
   "dependencies": {
     "change-case": "^3.1.0",
     "commander": "^3.0.1",
-    "enonic-fp": "^0.0.16",
+    "enonic-fp": "^0.1.0-RC1",
     "fp-ts": "^2.0.5",
     "xmldom": "^0.1.27",
     "xpath": "0.0.27"
@@ -37,10 +36,10 @@
   "devDependencies": {
     "@types/xmldom": "^0.1.29",
     "@types/jest": "^24.0.18",
-    "@types/node": "^12.7.4",
+    "@types/node": "^12.7.7",
     "jest": "^24.9.0",
     "rimraf": "^3.0.0",
-    "ts-jest": "^24.0.2",
-    "typescript": "^3.6.2"
+    "ts-jest": "^24.1.0",
+    "typescript": "^3.6.3"
   }
 }
