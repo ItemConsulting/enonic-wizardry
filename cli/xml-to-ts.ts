@@ -46,6 +46,7 @@ function replaceFileExtension(
 // using the --enonic-xml flag.
 const directories = [
   "src/main/resources/site/site.xml",
+  "src/main/resources/idprovider/idprovider.xml",
   "src/main/resources/site/content-types",
   "src/main/resources/site/parts",
   "src/main/resources/site/pages"
