@@ -118,7 +118,13 @@ function command(argv: Array<string>) {
 
   cmd.parse(argv);
 
-  const projectMixins = cmd.project ? listXmlFiles(path.join(cmd.project, mixinDir)) : [];
+  const absoluteMixinDirPath: string | undefined = cmd.project
+    ? path.join(cmd.project, mixinDir)
+    : undefined;
+
+  const projectMixins = absoluteMixinDirPath && fs.existsSync(absoluteMixinDirPath)
+    ? listXmlFiles(absoluteMixinDirPath)
+    : [];
   const mixinFiles = cmd.mixin.concat(projectMixins);
 
   for (const filename of mixinFiles) {
