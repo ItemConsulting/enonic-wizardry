@@ -107,14 +107,14 @@ enum GeneratedFieldType {
 
 function formatInterface(iface: GeneratedInterface): string {
   const fields = iface.fields.map(formatField).join("\n\n");
-  return `export interface ${iface.name} {\n${fields}\n};\n`;
+  return `export interface ${iface.name} {\n${fields}\n}\n`;
 }
 
 function formatField(field: GeneratedField): string {
   const optional = field.optional ? "?" : "";
   const comment = field.comment ? formatComment(field.comment) : "";
   const type = formatType(field.type, field.subfields || []);
-  return `${comment}  ${field.name}${optional}: ${type}`;
+  return `${comment}  ${field.name}${optional}: ${type};`;
 }
 
 function formatType(type: string, subfields: Array<GeneratedField>): string {
