@@ -15,7 +15,8 @@ function generateInterface(xmlFilename: string, tsFilename: string) {
 const directorySuffix: { [key: string]: string } = {
   parts: "-part-config",
   pages: "-page-config",
-  site: "-config"
+  site: "-config",
+  idprovider: "-config"
 };
 
 // tries to avoid conflicting filenames
