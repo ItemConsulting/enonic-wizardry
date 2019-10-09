@@ -1,19 +1,17 @@
-import * as context from "enonic-fp/lib/context";
+import { run } from "enonic-fp/lib/context";
+import { IO } from "fp-ts/lib/IO";
 
-export function runAsSuperUser<A, B>(f: (p:A) => B) : (p: A) => B {
-  return (params: A) => context.run({
-    repository: 'com.enonic.cms.default',
-    branch: 'draft',
+export function runAsSuperUser<A>(a: IO<A>): IO<A> {
+  return run<A>({
     user: {
-      login: 'su',
+      login: "su",
       idProvider: 'system'
-    },
-    principals: ["role:system.admin"]
-  }, () => f(params));
+    }
+  })(a);
 }
 
-export function runInDraftContext<A, B>(f: (p: A) =>  B) : (p: A) => B {
-  return (params: A) => context.run({
+export function runInDraftContext<A>(a: IO<A>): IO<A> {
+  return run<A>({
     branch: 'draft'
-  }, () => f(params));
+  })(a);
 }

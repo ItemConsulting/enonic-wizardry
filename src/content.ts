@@ -58,21 +58,21 @@ export function applyChangesToData<A>(key: string, changes: any) : ModifyContent
 
 export function createAndPublish<A>(params: CreateContentParams<A>) : IOEither<EnonicError, Content<A>> {
   return pipe(
-    runInDraftContext(create)(params),
+    runInDraftContext(create(params)),
     chain(publishFromDraftToMaster)
   );
 }
 
 export function deleteAndPublish(params: DeleteContentParams) : IOEither<EnonicError, void> {
   return pipe(
-    runInDraftContext(remove)(params),
+    runInDraftContext(remove(params)),
     chain(publishContentByKey(params.key))
   );
 }
 
 export function modifyAndPublish<A>(key: string, changes: any) : IOEither<EnonicError, Content<A>> {
   return pipe(
-    runInDraftContext(modify)(applyChangesToData<A>(key, changes)),
+    runInDraftContext(modify(applyChangesToData<A>(key, changes))),
     chain(publishFromDraftToMaster)
   );
 }
