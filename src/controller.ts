@@ -45,7 +45,13 @@ export const created = (body: any) => status(201, body);
 
 export const noContent = () => io.of<Response>({ status: 204, body: ''});
 
-export const redirect = (redirect: string) => io.of<Response>({ status: 303, redirect});
+export const redirect = (redirect: string) => io.of<Response>({
+  applyFilters: false,
+  postProcess: false,
+  redirect,
+  status: 303,
+  body: ''
+});
 
 export const badRequest = (body: any) => status(400, body);
 
