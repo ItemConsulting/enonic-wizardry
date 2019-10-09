@@ -14,10 +14,10 @@ import {
 import {runInDraftContext} from './context';
 
 export interface WithId {
-  _id: string
+  _id: string;
 }
 
-export function publishFromDraftToMaster<A>(content: Content<A>) : IOEither<EnonicError, Content<A>> {
+export function publishFromDraftToMaster<A>(content: Content<A>): IOEither<EnonicError, Content<A>> {
   return pipe(
     publish({
       keys: [content._id],
@@ -28,8 +28,8 @@ export function publishFromDraftToMaster<A>(content: Content<A>) : IOEither<Enon
   );
 }
 
-export function publishContentByKey<A>(key: string) : (a: A) => IOEither<EnonicError, A> {
-  return a => {
+export function publishContentByKey<A>(key: string): (a: A) => IOEither<EnonicError, A> {
+  return (a): IOEither<EnonicError, A> => {
     return pipe(
       publish({
         keys: [key],
@@ -41,10 +41,10 @@ export function publishContentByKey<A>(key: string) : (a: A) => IOEither<EnonicE
   }
 }
 
-export function applyChangesToData<A>(key: string, changes: any) : ModifyContentParams<A> {
+export function applyChangesToData<A>(key: string, changes: any): ModifyContentParams<A> {
   return {
     key,
-    editor: (content: Content<A>) => {
+    editor: (content: Content<A>): Content<A> => {
       content.data = {
         ...content.data,
         ...changes
@@ -56,28 +56,28 @@ export function applyChangesToData<A>(key: string, changes: any) : ModifyContent
   };
 }
 
-export function createAndPublish<A>(params: CreateContentParams<A>) : IOEither<EnonicError, Content<A>> {
+export function createAndPublish<A>(params: CreateContentParams<A>): IOEither<EnonicError, Content<A>> {
   return pipe(
     runInDraftContext(create(params)),
     chain(publishFromDraftToMaster)
   );
 }
 
-export function deleteAndPublish(params: DeleteContentParams) : IOEither<EnonicError, void> {
+export function deleteAndPublish(params: DeleteContentParams): IOEither<EnonicError, void> {
   return pipe(
     runInDraftContext(remove(params)),
     chain(publishContentByKey(params.key))
   );
 }
 
-export function modifyAndPublish<A>(key: string, changes: any) : IOEither<EnonicError, Content<A>> {
+export function modifyAndPublish<A>(key: string, changes: any): IOEither<EnonicError, Content<A>> {
   return pipe(
     runInDraftContext(modify(applyChangesToData<A>(key, changes))),
     chain(publishFromDraftToMaster)
   );
 }
 
-export function getContentDataWithId<T>(content: Content<T>) : T & WithId {
+export function getContentDataWithId<T>(content: Content<T>): T & WithId {
   const dataWithId = content.data as T & WithId;
   dataWithId._id = content._id;
   return dataWithId;
