@@ -1,5 +1,6 @@
-import * as E from 'fp-ts/lib/Either';
+import { IOEither, fromEither} from 'fp-ts/lib/IOEither';
 import { Option, some, filter, map } from 'fp-ts/lib/Option';
+import * as E from 'fp-ts/lib/Either';
 import { pipe } from "fp-ts/lib/pipeable";
 import { Request, EnonicError } from "enonic-fp/lib/common";
 
@@ -13,11 +14,15 @@ function substringAfter (path: string, separator = "/"): Option<string> {
   );
 }
 
-export function json(req: Request): E.Either<EnonicError, any> {
-  return E.parseJSON<EnonicError>(req.body, e => ({
-    errorKey: "BadRequestError",
-    cause: String(e)
-  }));
+export function parseJSON(req: Request): IOEither<EnonicError, any> {
+  return fromEither(
+    E.parseJSON<EnonicError>(req.body,
+      (e) => ({
+        errorKey: "BadRequestError",
+        cause: String(e)
+      })
+    )
+  );
 }
 
 export function getUuidFromPath (path: string): Option<string> {
