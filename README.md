@@ -33,7 +33,7 @@ To run the task as part of the deploy process, add it to the `jar` block:
 jar {
   // ... other dependencies
 
-  generateTypeScriptInterfaces
+  dependsOn += generateTypeScriptInterfaces
 
   // ...
 }
