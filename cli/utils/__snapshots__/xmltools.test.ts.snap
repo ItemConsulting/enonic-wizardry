@@ -1,5 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`InterfaceGenerator generates the correct CheckBox code 1`] = `
+"export interface CheckBoxExample {
+  /**
+   * GDPR Signed
+   */
+  gdprSigned?: boolean;
+}
+"
+`;
+
 exports[`InterfaceGenerator generates the correct ContentSelector code 1`] = `
 "export interface ContentSelectorExample {
   /**

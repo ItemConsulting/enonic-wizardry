@@ -246,6 +246,15 @@ const xml = {
       </config>
     </input>
   </form>
+</content-type>\n`,
+
+  checkbox: `<content-type>
+  <display-name>Using mixins</display-name>
+  <form>
+    <input name="gdprSigned" type="CheckBox">
+      <label>GDPR Signed</label>
+    </input>
+  </form>
 </content-type>\n`
 };
 
@@ -315,6 +324,12 @@ describe("parseXML", () => {
     const tsInterface = xmltools.parseXml("MixinExample", xml.contentSelector);
     const field = tsInterface.fields[0];
     expect(field.type).toBe("Array<string>");
+  });
+
+  test("parses CheckBox as boolean", () => {
+    const tsInterface = xmltools.parseXml("CheckBoxExample", xml.checkbox);
+    const field = tsInterface.fields[0];
+    expect(field.type).toBe("boolean");
   });
 
   test("parses the minimal site", () => {
@@ -405,6 +420,15 @@ describe("InterfaceGenerator", () => {
     const tsInterface = generator.createInterface(
       "ContentSelectorExample",
       xml.contentSelector
+    );
+    expect(tsInterface).toMatchSnapshot();
+  });
+
+  test("generates the correct CheckBox code", () => {
+    const generator = xmltools.NewInterfaceGenerator();
+    const tsInterface = generator.createInterface(
+      "CheckBoxExample",
+      xml.checkbox
     );
     expect(tsInterface).toMatchSnapshot();
   });
