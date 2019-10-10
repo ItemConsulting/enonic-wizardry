@@ -236,7 +236,6 @@ function createFieldFromInput(input: Node): GeneratedField {
     throw MissingFieldNameError;
   }
   const typeAttr = xpath.select1("@type", input);
-  console.error("typeAttr", typeAttr);
 
   const minimumOccurrencesAttr = xpath.select1("./occurrences/@minimum", input);
 
