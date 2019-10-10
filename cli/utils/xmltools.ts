@@ -101,6 +101,7 @@ interface Mixin {
 }
 
 enum GeneratedFieldType {
+  Boolean = "boolean",
   String = "string",
   StringArray = "Array<string>",
   Array = "Array",
@@ -252,6 +253,8 @@ function getType(inputType: string): GeneratedFieldType {
   switch (inputType) {
     case "ContentSelector":
       return GeneratedFieldType.StringArray;
+    case "CheckBox":
+      return GeneratedFieldType.Boolean;
     default:
       return GeneratedFieldType.String;
   }
