@@ -2,7 +2,7 @@ import { pascalCase } from "change-case";
 import * as path from "path";
 import * as xmldom from "xmldom";
 import { evaluate, flatmapXpathResult, mapXpathResult } from "./xpathutils";
-import * as xpath from "xpath";
+const xpath = require('xpath');
 
 export const MissingFieldNameError = "A field is missing a name attribute";
 export const InvalidMixinError = "Failed to parse mixin";

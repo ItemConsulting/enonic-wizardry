@@ -1,4 +1,4 @@
-import * as xpath from "xpath";
+const xpath = require('xpath');
 
 export function evaluate(
   xpathExpression: string,
