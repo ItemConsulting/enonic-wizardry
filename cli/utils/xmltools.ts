@@ -41,10 +41,12 @@ class Generator implements InterfaceGenerator {
 
   createInterface(interfaceName: string, xml: string): string {
     const iface = parseXml(interfaceName, xml);
-    return formatInterface({
-      name: interfaceName,
-      fields: iface.fields.reduce(this.substituteMixins, [])
-    });
+    return iface.fields.length > 0
+      ? formatInterface({
+          name: interfaceName,
+          fields: iface.fields.reduce(this.substituteMixins, [])
+        })
+      : "";
   }
 
   addMixin(filename: string, xml: string) {
@@ -199,7 +201,7 @@ function getItemSetFields(node: Node): Array<GeneratedField> {
       const name = xpath.select1("string(@name)", node);
       const type = GeneratedFieldType.Array;
       const optional = minimumOccurrences ? minimumOccurrences === "0" : true;
-      const comment = xpath.select1('string(./label)', node);
+      const comment = xpath.select1("string(./label)", node);
 
       const items = evaluate("./items", node).iterateNext();
       const subfields = items

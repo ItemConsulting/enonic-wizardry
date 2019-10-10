@@ -154,7 +154,9 @@ function command(argv: Array<string>) {
     try {
       const tsFilename = rename(xmlFilename);
       const tsInterface = generateInterface(xmlFilename, tsFilename);
-      write(tsFilename)(tsInterface);
+      if (tsInterface) {
+        write(tsFilename)(tsInterface);
+      }
     } catch (err) {
       if (err === xmltools.MissingFieldNameError) {
         exit(`${xmlFilename}: ${err}`);
