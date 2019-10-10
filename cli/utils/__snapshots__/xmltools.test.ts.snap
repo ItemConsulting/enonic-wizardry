@@ -1,5 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`InterfaceGenerator generates the correct ContentSelector code 1`] = `
+"export interface ContentSelectorExample {
+  /**
+   * Members
+   */
+  members?: Array<string>;
+}
+"
+`;
+
 exports[`InterfaceGenerator generates the correct FieldSet code 1`] = `
 "export interface FieldSetUser {
   /**

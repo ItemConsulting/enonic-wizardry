@@ -232,6 +232,20 @@ const xml = {
   <display-name>Employee</display-name>
   <super-type>base:structured</super-type>
   <form></form>
+</content-type>\n`,
+
+  contentSelector: `<content-type>
+  <display-name>Group</display-name>
+  <super-type>base:structured</super-type>
+  <form>
+    <input name="members" type="ContentSelector">
+      <label>Members</label>
+      <occurrences minimum="0" maximum="0"/>
+      <config>
+        <allowContentType>employee</allowContentType>
+      </config>
+    </input>
+  </form>
 </content-type>\n`
 };
 
@@ -295,6 +309,12 @@ describe("parseXML", () => {
     expect(tsInterface.fields.length).toBe(1);
     expect(tsInterface.fields[0].subfields.length).toBe(3);
     expect(tsInterface.fields[0].subfields[2].subfields.length).toBe(1);
+  });
+
+  test("parses ContentSelector as Array<string>", () => {
+    const tsInterface = xmltools.parseXml("MixinExample", xml.contentSelector);
+    const field = tsInterface.fields[0];
+    expect(field.type).toBe("Array<string>");
   });
 
   test("parses the minimal site", () => {
@@ -377,6 +397,15 @@ describe("InterfaceGenerator", () => {
   test("generates the correct ItemSet code", () => {
     const generator = xmltools.NewInterfaceGenerator();
     const tsInterface = generator.createInterface("ItemSetUser", xml.itemSet);
+    expect(tsInterface).toMatchSnapshot();
+  });
+
+  test("generates the correct ContentSelector code", () => {
+    const generator = xmltools.NewInterfaceGenerator();
+    const tsInterface = generator.createInterface(
+      "ContentSelectorExample",
+      xml.contentSelector
+    );
     expect(tsInterface).toMatchSnapshot();
   });
 

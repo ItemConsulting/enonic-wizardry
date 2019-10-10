@@ -2,7 +2,7 @@ import { pascalCase } from "change-case";
 import * as path from "path";
 import * as xmldom from "xmldom";
 import { evaluate, flatmapXpathResult, mapXpathResult } from "./xpathutils";
-const xpath = require('xpath');
+const xpath = require("xpath");
 
 export const MissingFieldNameError = "A field is missing a name attribute";
 export const InvalidMixinError = "Failed to parse mixin";
@@ -102,6 +102,7 @@ interface Mixin {
 
 enum GeneratedFieldType {
   String = "string",
+  StringArray = "Array<string>",
   Array = "Array",
   Object = "Object",
   Mixin = "mixin"
@@ -234,6 +235,8 @@ function createFieldFromInput(input: Node): GeneratedField {
   if (!nameAttr) {
     throw MissingFieldNameError;
   }
+  const typeAttr = xpath.select1("@type", input);
+  console.error("typeAttr", typeAttr);
 
   const minimumOccurrencesAttr = xpath.select1("./occurrences/@minimum", input);
 
@@ -242,6 +245,15 @@ function createFieldFromInput(input: Node): GeneratedField {
   const optional = minimumOccurrencesAttr
     ? minimumOccurrencesAttr.value === "0"
     : true;
-  const type = GeneratedFieldType.String;
+  const type = getType(typeAttr ? typeAttr.value : "");
   return { name, type, comment, optional };
+}
+
+function getType(inputType: string): GeneratedFieldType {
+  switch (inputType) {
+    case "ContentSelector":
+      return GeneratedFieldType.StringArray;
+    default:
+      return GeneratedFieldType.String;
+  }
 }
