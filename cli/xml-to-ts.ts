@@ -5,7 +5,7 @@ import * as xmltools from "./utils/xmltools";
 
 const generator = xmltools.NewInterfaceGenerator();
 
-function generateInterface(xmlFilename: string, tsFilename: string) {
+function generateInterface(xmlFilename: string, tsFilename: string): string {
   const interfaceName = xmltools.generateInterfaceName(tsFilename);
   const xml = fs.readFileSync(xmlFilename, "utf-8");
   return generator.createInterface(interfaceName, xml);
@@ -38,7 +38,7 @@ function getTsFilename(filename: string): string {
 function replaceFileExtension(
   newExtension: string
 ): (filename: string) => string {
-  return filename =>
+  return (filename: string): string =>
     filename.substring(0, filename.length - path.extname(filename).length) +
     newExtension;
 }
@@ -83,28 +83,28 @@ function listFiles(dir: string): Array<string> {
     }, []);
 }
 
-function consoleWriter(_: string): (output: string) => void {
+function consoleWriter(): (output: string) => void {
   return console.log;
 }
 
 function fileWriter(filename: string): (output: string) => void {
-  return (output: string) => {
+  return (output: string): void => {
     const fd = fs.openSync(filename, "w+");
     fs.writeSync(fd, Buffer.from(output, "utf8"));
     fs.closeSync(fd);
   };
 }
 
-function exit(message: string) {
+function exit(message: string): void {
   console.error(message);
   process.exit(1);
 }
 
-function collect<T>(next: T, prev: Array<T>) {
+function collect<T>(next: T, prev: Array<T>): Array<T> {
   return prev.concat([next]);
 }
 
-function command(argv: Array<string>) {
+function command(argv: Array<string>): void {
   const cmd = new commander.Command();
 
   cmd
@@ -123,9 +123,10 @@ function command(argv: Array<string>) {
     ? path.join(cmd.project, mixinDir)
     : undefined;
 
-  const projectMixins = absoluteMixinDirPath && fs.existsSync(absoluteMixinDirPath)
-    ? listXmlFiles(absoluteMixinDirPath)
-    : [];
+  const projectMixins =
+    absoluteMixinDirPath && fs.existsSync(absoluteMixinDirPath)
+      ? listXmlFiles(absoluteMixinDirPath)
+      : [];
   const mixinFiles = cmd.mixin.concat(projectMixins);
 
   for (const filename of mixinFiles) {
@@ -154,7 +155,9 @@ function command(argv: Array<string>) {
     try {
       const tsFilename = rename(xmlFilename);
       const tsInterface = generateInterface(xmlFilename, tsFilename);
-      write(tsFilename)(tsInterface);
+      if (tsInterface) {
+        write(tsFilename)(tsInterface);
+      }
     } catch (err) {
       if (err === xmltools.MissingFieldNameError) {
         exit(`${xmlFilename}: ${err}`);

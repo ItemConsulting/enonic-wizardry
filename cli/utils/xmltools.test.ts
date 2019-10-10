@@ -221,7 +221,18 @@ const xml = {
       <occurrences minimum="1" maximum="1"/>
     </input>
   </form>
-</mixin>`
+</mixin>`,
+
+  noForm: `<content-type>
+  <display-name>Employee</display-name>
+  <super-type>base:structured</super-type>
+</content-type>\n`,
+
+  emptyForm: `<content-type>
+  <display-name>Employee</display-name>
+  <super-type>base:structured</super-type>
+  <form></form>
+</content-type>\n`
 };
 
 describe("parseXML", () => {
@@ -375,6 +386,21 @@ describe("InterfaceGenerator", () => {
     const tsInterface = generator.createInterface("MixedIn", xml.mixinUser);
     expect(tsInterface).toMatchSnapshot();
   });
+
+  test("returns empty string when no form can be found", () => {
+    const generator = xmltools.NewInterfaceGenerator();
+    const tsInterface = generator.createInterface("ShouldBeNull", xml.noForm);
+    expect(tsInterface).toBe("");
+  });
+
+  test("returns empty string when form is empty", () => {
+    const generator = xmltools.NewInterfaceGenerator();
+    const tsInterface = generator.createInterface(
+      "ShouldBeNull",
+      xml.emptyForm
+    );
+    expect(tsInterface).toBe("");
+  });
 });
 
 describe("generateInterfaceName", () => {
@@ -384,7 +410,7 @@ describe("generateInterfaceName", () => {
       "myLittleInterface",
       "my-little-interface"
     ];
-    for (var filename of filenames) {
+    for (const filename of filenames) {
       const iname = xmltools.generateInterfaceName(filename);
       expect(iname).toBe("MyLittleInterface");
     }

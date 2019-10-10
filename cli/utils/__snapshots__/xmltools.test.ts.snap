@@ -5,13 +5,13 @@ exports[`InterfaceGenerator generates the correct FieldSet code 1`] = `
   /**
    * Runde 1
    */
-  juryvote1?: string
+  juryvote1?: string;
 
   /**
    * Runde 2
    */
-  juryvote2?: string
-};
+  juryvote2?: string;
+}
 "
 `;
 
@@ -24,12 +24,12 @@ exports[`InterfaceGenerator generates the correct ItemSet code 1`] = `
     /**
      * Label
      */
-    label?: string
+    label?: string;
 
     /**
      * Phone Number
      */
-    phoneNumber?: string
+    phoneNumber?: string;
 
     /**
      * Contact Info
@@ -38,10 +38,10 @@ exports[`InterfaceGenerator generates the correct ItemSet code 1`] = `
       /**
        * Phone Number
        */
-      phoneNumber?: string
-    }>
-  }>
-};
+      phoneNumber?: string;
+    }>;
+  }>;
+}
 "
 `;
 
@@ -50,13 +50,13 @@ exports[`InterfaceGenerator generates the correct input code 1`] = `
   /**
    * First name
    */
-  firstName: string
+  firstName: string;
 
   /**
    * Last name
    */
-  lastName?: string
-};
+  lastName?: string;
+}
 "
 `;
 
@@ -65,12 +65,12 @@ exports[`InterfaceGenerator generates the correct mixin code 1`] = `
   /**
    * First Name
    */
-  firstName: string
+  firstName: string;
 
   /**
    * Last Name
    */
-  lastName: string
+  lastName: string;
 
   /**
    * Full address
@@ -79,23 +79,23 @@ exports[`InterfaceGenerator generates the correct mixin code 1`] = `
     /**
      * Street address
      */
-    addressLine?: string
+    addressLine?: string;
 
     /**
      * City
      */
-    city: string
+    city: string;
 
     /**
      * Zip code
      */
-    zipCode: string
+    zipCode: string;
 
     /**
      * Country
      */
-    country: string
-  }
-};
+    country: string;
+  };
+}
 "
 `;

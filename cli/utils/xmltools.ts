@@ -2,7 +2,7 @@ import { pascalCase } from "change-case";
 import * as path from "path";
 import * as xmldom from "xmldom";
 import { evaluate, flatmapXpathResult, mapXpathResult } from "./xpathutils";
-const xpath = require("xpath");
+import * as xpath from "xpath";
 
 export const MissingFieldNameError = "A field is missing a name attribute";
 export const InvalidMixinError = "Failed to parse mixin";
@@ -41,13 +41,15 @@ class Generator implements InterfaceGenerator {
 
   createInterface(interfaceName: string, xml: string): string {
     const iface = parseXml(interfaceName, xml);
-    return formatInterface({
-      name: interfaceName,
-      fields: iface.fields.reduce(this.substituteMixins, [])
-    });
+    return iface.fields.length > 0
+      ? formatInterface({
+          name: interfaceName,
+          fields: iface.fields.reduce(this.substituteMixins, [])
+        })
+      : "";
   }
 
-  addMixin(filename: string, xml: string) {
+  addMixin(filename: string, xml: string): void {
     const doc = new xmldom.DOMParser().parseFromString(xml);
 
     const name = path.basename(filename, path.extname(filename));
@@ -199,7 +201,7 @@ function getItemSetFields(node: Node): Array<GeneratedField> {
       const name = xpath.select1("string(@name)", node);
       const type = GeneratedFieldType.Array;
       const optional = minimumOccurrences ? minimumOccurrences === "0" : true;
-      const comment = xpath.select1('string(./label)', node);
+      const comment = xpath.select1("string(./label)", node);
 
       const items = evaluate("./items", node).iterateNext();
       const subfields = items
