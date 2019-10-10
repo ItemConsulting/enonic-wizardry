@@ -2,7 +2,8 @@ import { pascalCase } from "change-case";
 import * as path from "path";
 import * as xmldom from "xmldom";
 import { evaluate, flatmapXpathResult, mapXpathResult } from "./xpathutils";
-const xpath = require("xpath");
+import * as xpath from "xpath";
+// const xpath = require("xpath");
 
 export const MissingFieldNameError = "A field is missing a name attribute";
 export const InvalidMixinError = "Failed to parse mixin";
@@ -49,7 +50,7 @@ class Generator implements InterfaceGenerator {
       : "";
   }
 
-  addMixin(filename: string, xml: string) {
+  addMixin(filename: string, xml: string): void {
     const doc = new xmldom.DOMParser().parseFromString(xml);
 
     const name = path.basename(filename, path.extname(filename));
