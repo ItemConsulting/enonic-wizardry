@@ -13,6 +13,16 @@ exports[`InterfaceGenerator generates the correct CheckBox code 1`] = `
 exports[`InterfaceGenerator generates the correct ContentSelector code 1`] = `
 "export interface ContentSelectorExample {
   /**
+   * FAB button target
+   */
+  fabTarget?: string;
+}
+"
+`;
+
+exports[`InterfaceGenerator generates the correct ContentSelector code 2`] = `
+"export interface ContentSelectorExample {
+  /**
    * Members
    */
   members?: Array<string>;
