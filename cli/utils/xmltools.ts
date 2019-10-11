@@ -239,20 +239,33 @@ function createFieldFromInput(input: Node): GeneratedField {
   const typeAttr = xpath.select1("@type", input);
 
   const minimumOccurrencesAttr = xpath.select1("./occurrences/@minimum", input);
+  const maximumOccurrencesAttr = xpath.select1("./occurrences/@maximum", input);
 
   const name = nameAttr.value;
   const comment = xpath.select1("string(./label)", input);
+
   const optional = minimumOccurrencesAttr
     ? minimumOccurrencesAttr.value === "0"
     : true;
-  const type = getType(typeAttr ? typeAttr.value : "");
+
+  const type = getType(typeAttr ? typeAttr.value : "", {
+    maxOccurrences: maximumOccurrencesAttr
+      ? Number.parseInt(maximumOccurrencesAttr.value)
+      : undefined
+  });
+
   return { name, type, comment, optional };
 }
 
-function getType(inputType: string): GeneratedFieldType {
+function getType(
+  inputType: string,
+  options: { maxOccurrences?: number }
+): GeneratedFieldType {
   switch (inputType) {
     case "ContentSelector":
-      return GeneratedFieldType.StringArray;
+      return options.maxOccurrences === 1
+        ? GeneratedFieldType.String
+        : GeneratedFieldType.StringArray;
     case "CheckBox":
       return GeneratedFieldType.Boolean;
     default:

@@ -234,13 +234,24 @@ const xml = {
   <form></form>
 </content-type>\n`,
 
-  contentSelector: `<content-type>
+  contentSelectorSingle: `<content-type>
+  <display-name>Group</display-name>
+  <super-type>base:structured</super-type>
+  <form>
+  <input name="fabTarget" type="ContentSelector">
+    <label>FAB button target</label>
+    <occurrences minimum="0" maximum="1"/>
+  </input>
+  </form>
+</content-type>\n`,
+
+  contentSelectorMultiple: `<content-type>
   <display-name>Group</display-name>
   <super-type>base:structured</super-type>
   <form>
     <input name="members" type="ContentSelector">
       <label>Members</label>
-      <occurrences minimum="0" maximum="0"/>
+      <occurrences minimum="0" maximum="2"/>
       <config>
         <allowContentType>employee</allowContentType>
       </config>
@@ -320,8 +331,20 @@ describe("parseXML", () => {
     expect(tsInterface.fields[0].subfields[2].subfields.length).toBe(1);
   });
 
+  test("parses ContentSelector as string", () => {
+    const tsInterface = xmltools.parseXml(
+      "ContentSelectorExample",
+      xml.contentSelectorSingle
+    );
+    const field = tsInterface.fields[0];
+    expect(field.type).toBe("string");
+  });
+
   test("parses ContentSelector as Array<string>", () => {
-    const tsInterface = xmltools.parseXml("MixinExample", xml.contentSelector);
+    const tsInterface = xmltools.parseXml(
+      "ContentSelectorExample",
+      xml.contentSelectorMultiple
+    );
     const field = tsInterface.fields[0];
     expect(field.type).toBe("Array<string>");
   });
@@ -417,11 +440,18 @@ describe("InterfaceGenerator", () => {
 
   test("generates the correct ContentSelector code", () => {
     const generator = xmltools.NewInterfaceGenerator();
-    const tsInterface = generator.createInterface(
+
+    const tsInterfaceSingle = generator.createInterface(
       "ContentSelectorExample",
-      xml.contentSelector
+      xml.contentSelectorSingle
     );
-    expect(tsInterface).toMatchSnapshot();
+    expect(tsInterfaceSingle).toMatchSnapshot();
+
+    const tsInterfaceMultiple = generator.createInterface(
+      "ContentSelectorExample",
+      xml.contentSelectorMultiple
+    );
+    expect(tsInterfaceMultiple).toMatchSnapshot();
   });
 
   test("generates the correct CheckBox code", () => {
