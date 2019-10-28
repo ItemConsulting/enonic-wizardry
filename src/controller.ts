@@ -1,4 +1,4 @@
-import { EnonicError, EnonicErrorKey, Response } from "enonic-fp/lib/common";
+import {EnonicError, EnonicErrorKey, isBadRequestError, Response} from "enonic-fp/lib/common";
 import { localize } from "enonic-fp/lib/i18n";
 import { getOrElse } from 'fp-ts/lib/Option'
 import {IO, io, map} from "fp-ts/lib/IO";
@@ -32,9 +32,16 @@ export function errorResponse(i18nPrefix: string, debug = false): (err: EnonicEr
   return (err: EnonicError): IO<Response> => {
     const i18nKey = `${i18nPrefix}.${err.errorKey}`;
 
+
+
     return status(defaultStatusNumbers[err.errorKey], {
       message: getOrElse(() => i18nKey)(localize({ key: i18nKey })),
-      cause: debug ? err.cause : undefined
+      cause: debug && !isBadRequestError(err)
+        ? err.cause
+        : undefined,
+      errors: isBadRequestError(err)
+        ? err.errors
+        : undefined
     });
   };
 }

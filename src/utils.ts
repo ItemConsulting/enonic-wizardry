@@ -14,12 +14,14 @@ function substringAfter (path: string, separator = "/"): Option<string> {
   );
 }
 
-export function parseJSON(req: Request): IOEither<EnonicError, any> {
+export function json(req: Request, errorMessage = "Unable to parse json from request"): IOEither<EnonicError, any> {
   return fromEither(
     E.parseJSON<EnonicError>(req.body,
-      (e) => ({
+      () => ({
         errorKey: "BadRequestError",
-        cause: String(e)
+        errors: {
+          message: [errorMessage]
+        }
       })
     )
   );
