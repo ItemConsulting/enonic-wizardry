@@ -1,5 +1,5 @@
 import { EnonicError } from "enonic-fp/lib/common";
-import { IOEither, map, chain } from "fp-ts/lib/IOEither";
+import {IOEither, map, chain, ioEither} from "fp-ts/lib/IOEither";
 import { pipe } from "fp-ts/lib/pipeable";
 import {
   Content,
@@ -9,12 +9,37 @@ import {
   CreateContentParams,
   DeleteContentParams,
   remove,
-  modify
+  modify,
+  createMedia
 } from "enonic-fp/lib/content";
-import {runInDraftContext} from './context';
+import { runInDraftContext } from './context';
+import { getMultipartItem, getMultipartStream } from "enonic-fp/lib/portal";
+import { sequenceT } from "fp-ts/lib/Apply";
 
 export interface WithId {
   _id: string;
+}
+
+export interface CreateMediaFromAttachmentParams {
+  /**
+   * Name of the field in the form
+   */
+  readonly name: string;
+
+  /**
+   * Parent path to store the media in Enonic
+   */
+  readonly parentPath: string;
+
+  /**
+   * Index in the form, if there are multiple fields with the same name
+   */
+  readonly index?: number;
+
+  /**
+   * Error message for if the form field is not found
+   */
+  readonly errorMessage?: string;
 }
 
 export function publishFromDraftToMaster<A>(content: Content<A>): IOEither<EnonicError, Content<A>> {
@@ -78,8 +103,27 @@ export function modifyAndPublish<A>(key: string, changes: any): IOEither<EnonicE
   );
 }
 
-export function getContentDataWithId<T>(content: Content<T>): T & WithId {
-  const dataWithId = content.data as T & WithId;
+export function getContentDataWithId<A>(content: Content<A>): A & WithId {
+  const dataWithId = content.data as A & WithId;
   dataWithId._id = content._id;
   return dataWithId;
+}
+
+export function createMediaFromAttachment<A>(params: CreateMediaFromAttachmentParams): IOEither<EnonicError, Content<A>> {
+  return pipe(
+    sequenceT(ioEither)(
+      getMultipartStream(name, params.index, params.errorMessage),
+      getMultipartItem(name, params.index, params.errorMessage)
+    ),
+    chain(([data, item]) =>
+      createMedia(
+        {
+          data,
+          parentPath: params.parentPath,
+          name: item.fileName,
+          mimeType: item.contentType
+        }
+      )
+    )
+  );
 }
