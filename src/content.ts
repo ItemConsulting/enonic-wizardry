@@ -44,14 +44,15 @@ export function publishContentByKey<A>(key: string): (a: A) => IOEither<EnonicEr
 export function applyChangesToData<A>(key: string, changes: any): ModifyContentParams<A> {
   return {
     key,
-    editor: (content: Content<A>): Content<A> => {
-      content.data = {
-        ...content.data,
-        ...changes
-      };
-
-      return content;
-    },
+    editor: (content: Content<A>): Content<A> => (
+      {
+        ...content,
+        data: {
+          ...content.data,
+          ...changes
+        }
+      }
+    ),
     requireValid: true
   };
 }

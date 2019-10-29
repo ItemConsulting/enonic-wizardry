@@ -76,9 +76,12 @@ export const badGateway = (body: any): IO<Response> =>  status(502, body);
 
 export function setTotal(total: number, response: IO<Response>): IO<Response> {
   return map((res: Response) => {
-    res.headers = {
-      'X-Total-Count': String(total)
+    return {
+      ...res,
+      headers: {
+        ...res.headers,
+        'X-Total-Count': String(total)
+      }
     };
-    return res;
   })(response);
 }
