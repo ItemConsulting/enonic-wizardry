@@ -17,7 +17,7 @@ import { getMultipartItem, getMultipartStream } from "enonic-fp/lib/portal";
 import { sequenceT } from "fp-ts/lib/Apply";
 
 export interface WithId {
-  _id: string;
+  readonly _id: string;
 }
 
 export interface CreateMediaFromAttachmentParams {
@@ -104,9 +104,10 @@ export function modifyAndPublish<A>(key: string, changes: any): IOEither<EnonicE
 }
 
 export function getContentDataWithId<A>(content: Content<A>): A & WithId {
-  const dataWithId = content.data as A & WithId;
-  dataWithId._id = content._id;
-  return dataWithId;
+  return {
+    ...content.data,
+    _id: content._id
+  };
 }
 
 export function createMediaFromAttachment<A>(params: CreateMediaFromAttachmentParams): IOEither<EnonicError, Content<A>> {
