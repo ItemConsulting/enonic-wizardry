@@ -113,8 +113,8 @@ export function getContentDataWithId<A>(content: Content<A>): A & WithId {
 export function createMediaFromAttachment<A>(params: CreateMediaFromAttachmentParams): IOEither<EnonicError, Content<A>> {
   return pipe(
     sequenceT(ioEither)(
-      getMultipartStream(name, params.index, params.errorMessage),
-      getMultipartItem(name, params.index, params.errorMessage)
+      getMultipartStream(params.name, params.index, params.errorMessage),
+      getMultipartItem(params.name, params.index, params.errorMessage)
     ),
     chain(([data, item]) =>
       createMedia(
