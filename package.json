@@ -1,16 +1,13 @@
 {
   "name": "enonic-wizardry",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Functional utility library for Enonic XP",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
     "clean": "rimraf lib/* bin/*",
-    "build": "npm run clean && tsc && npm run build:cli",
-    "build:cli": "tsc -p tsconfig.cli.json",
-    "test": "jest",
-    "watch:test": "jest --watch",
-    "lint:ts": "eslint --fix 'src/**/*.ts'"
+    "build": "npm run clean && tsc",
+    "lint": "eslint --fix 'src/**/*.ts'"
   },
   "repository": {
     "type": "git",
@@ -27,27 +24,18 @@
   },
   "homepage": "https://github.com/ItemConsulting/enonic-wizardry#readme",
   "dependencies": {
-    "change-case": "^3.1.0",
-    "commander": "^3.0.2",
     "enonic-fp": "^0.2.0",
     "enonic-types": "0.0.5",
     "fp-ts": "^2.1.1",
-    "io-ts": "^2.0.1",
-    "xmldom": "^0.1.27",
-    "xpath": "0.0.27"
+    "io-ts": "^2.0.1"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.20",
-    "@types/node": "^12.7.12",
-    "@types/xmldom": "^0.1.29",
     "@typescript-eslint/eslint-plugin": "^2.5.0",
     "@typescript-eslint/parser": "^2.5.0",
     "eslint": "^6.6.0",
     "husky": "^3.0.9",
-    "jest": "^24.9.0",
     "lint-staged": "^9.4.2",
     "rimraf": "^3.0.0",
-    "ts-jest": "^24.1.0",
     "typescript": "^3.6.4"
   },
   "husky": {
