@@ -2,12 +2,8 @@ import { EnonicError } from "enonic-fp/lib/common";
 import {IOEither, map, chain, ioEither} from "fp-ts/lib/IOEither";
 import { pipe } from "fp-ts/lib/pipeable";
 import {
-  Content,
   publish,
-  ModifyContentParams,
   create,
-  CreateContentParams,
-  DeleteContentParams,
   remove,
   modify,
   createMedia
@@ -15,6 +11,7 @@ import {
 import { runInDraftContext } from './context';
 import { getMultipartItem, getMultipartStream } from "enonic-fp/lib/portal";
 import { sequenceT } from "fp-ts/lib/Apply";
+import {Content, CreateContentParams, DeleteContentParams, ModifyContentParams} from "enonic-types/lib/content";
 
 export interface WithId {
   readonly _id: string;
