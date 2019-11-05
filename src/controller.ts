@@ -1,5 +1,5 @@
-import { EnonicError, EnonicErrorKey, isBadRequestError } from "enonic-fp/lib/common";
-import { Response } from "enonic-types/lib/common";
+import { EnonicError, EnonicErrorKey, isBadRequestError } from "enonic-fp/lib/errors";
+import { Response } from "enonic-types/lib/controller";
 import { localize } from "enonic-fp/lib/i18n";
 import { getOrElse } from 'fp-ts/lib/Option'
 import { IO, io, map } from "fp-ts/lib/IO";

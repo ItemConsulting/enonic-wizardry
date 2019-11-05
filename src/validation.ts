@@ -1,7 +1,7 @@
 import { Type, Errors } from 'io-ts';
 import { Either } from 'fp-ts/lib/Either'
 import { ObjectReporter } from "./reporters/ObjectReporter";
-import { EnonicError } from 'enonic-fp/lib/common';
+import { EnonicError } from 'enonic-fp/lib/errors';
 import { IOEither, fromEither, mapLeft } from "fp-ts/lib/IOEither";
 import { pipe } from "fp-ts/lib/pipeable";
 

@@ -2,8 +2,8 @@ import { IOEither, fromEither} from 'fp-ts/lib/IOEither';
 import { Option, some, filter, map } from 'fp-ts/lib/Option';
 import * as E from 'fp-ts/lib/Either';
 import { pipe } from "fp-ts/lib/pipeable";
-import { EnonicError } from "enonic-fp/lib/common";
-import { Request } from "enonic-types/lib/common";
+import { EnonicError } from "enonic-fp/lib/errors";
+import { Request } from "enonic-types/lib/controller";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
