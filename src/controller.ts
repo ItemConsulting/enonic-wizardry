@@ -1,7 +1,8 @@
-import {EnonicError, EnonicErrorKey, isBadRequestError, Response} from "enonic-fp/lib/common";
+import { EnonicError, EnonicErrorKey, isBadRequestError } from "enonic-fp/lib/common";
+import { Response } from "enonic-types/lib/common";
 import { localize } from "enonic-fp/lib/i18n";
 import { getOrElse } from 'fp-ts/lib/Option'
-import {IO, io, map} from "fp-ts/lib/IO";
+import { IO, io, map } from "fp-ts/lib/IO";
 
 export const defaultStatusNumbers: { [key in EnonicErrorKey]: number } = {
   "BadRequestError": 400,
