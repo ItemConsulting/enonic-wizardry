@@ -63,7 +63,7 @@ export function publishContentByKey<A>(key: string): (a: A) => IOEither<EnonicEr
   }
 }
 
-export function applyChangesToData<A>(key: string, changes: any): ModifyContentParams<A> {
+export function applyChangesToData<A>(key: string, changes: Partial<A>): ModifyContentParams<A> {
   return {
     key,
     editor: (content: Content<A>): Content<A> => (
@@ -93,7 +93,7 @@ export function deleteAndPublish(params: DeleteContentParams): IOEither<EnonicEr
   );
 }
 
-export function modifyAndPublish<A>(key: string, changes: any): IOEither<EnonicError, Content<A>> {
+export function modifyAndPublish<A>(key: string, changes: Partial<A>): IOEither<EnonicError, Content<A>> {
   return pipe(
     runInDraftContext(modify(applyChangesToData<A>(key, changes))),
     chain(publishFromDraftToMaster)
