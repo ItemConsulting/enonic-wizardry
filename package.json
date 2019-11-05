@@ -1,6 +1,6 @@
 {
   "name": "enonic-wizardry",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Functional utility library for Enonic XP",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -24,8 +24,8 @@
   },
   "homepage": "https://github.com/ItemConsulting/enonic-wizardry#readme",
   "dependencies": {
-    "enonic-fp": "^0.2.0",
-    "enonic-types": "0.0.5",
+    "enonic-fp": "^0.2.5",
+    "enonic-types": "^0.0.11",
     "fp-ts": "^2.1.1",
     "io-ts": "^2.0.1"
   },
