@@ -33,8 +33,6 @@ export function errorResponse(i18nPrefix: string, debug = false): (err: EnonicEr
   return (err: EnonicError): IO<Response> => {
     const i18nKey = `${i18nPrefix}.${err.errorKey}`;
 
-
-
     return status(defaultStatusNumbers[err.errorKey], {
       message: getOrElse(() => i18nKey)(localize({ key: i18nKey })),
       cause: debug && !isBadRequestError(err)
