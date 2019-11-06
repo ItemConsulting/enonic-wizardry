@@ -13,9 +13,7 @@ import { getMultipartItem, getMultipartStream } from "enonic-fp/lib/portal";
 import { sequenceT } from "fp-ts/lib/Apply";
 import {Content, CreateContentParams, DeleteContentParams, ModifyContentParams} from "enonic-types/lib/content";
 
-export interface WithId {
-  readonly _id: string;
-}
+export type WithId<T> = T & { _id: string }
 
 export interface CreateMediaFromAttachmentParams {
   /**
@@ -100,7 +98,7 @@ export function modifyAndPublish<A>(key: string, changes: Partial<A>): IOEither<
   );
 }
 
-export function getContentDataWithId<A>(content: Content<A>): A & WithId {
+export function getContentDataWithId<A>(content: Content<A>): WithId<A> {
   return {
     ...content.data,
     _id: content._id
