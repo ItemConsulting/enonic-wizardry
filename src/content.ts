@@ -1,5 +1,5 @@
 import { EnonicError } from "enonic-fp/lib/errors";
-import {IOEither, map, chain, ioEither} from "fp-ts/lib/IOEither";
+import { chain, filterOrElse, ioEither, IOEither, map } from "fp-ts/lib/IOEither";
 import { pipe } from "fp-ts/lib/pipeable";
 import {
   publish,
@@ -10,8 +10,8 @@ import {
 } from "enonic-fp/lib/content";
 import { runInDraftContext } from './context';
 import { getMultipartItem, getMultipartStream } from "enonic-fp/lib/portal";
-import { sequenceT } from "fp-ts/lib/Apply";
-import {Content, CreateContentParams, DeleteContentParams, ModifyContentParams} from "enonic-types/lib/content";
+import { sequenceS } from "fp-ts/lib/Apply";
+import { Content, CreateContentParams, DeleteContentParams, ModifyContentParams } from "enonic-types/lib/content";
 
 export type WithId<T> = T & { _id: string }
 
@@ -107,11 +107,20 @@ export function getContentDataWithId<A>(content: Content<A>): WithId<A> {
 
 export function createMediaFromAttachment<A>(params: CreateMediaFromAttachmentParams): IOEither<EnonicError, Content<A>> {
   return pipe(
-    sequenceT(ioEither)(
-      getMultipartStream(params.name, params.index, params.errorMessage),
-      getMultipartItem(params.name, params.index, params.errorMessage)
+    sequenceS(ioEither)({
+      data: getMultipartStream(params.name, params.index, params.errorMessage),
+      item: getMultipartItem(params.name, params.index, params.errorMessage)
+    }),
+    filterOrElse(
+      (res) => res.item.fileName?.length !== 0,
+      () => ({
+        errorKey: "BadRequestError",
+        errors: {
+          [params.name]: [params.errorMessage]
+        }
+      } as EnonicError)
     ),
-    chain(([data, item]) =>
+    chain(({ data, item }) =>
       createMedia(
         {
           data,
