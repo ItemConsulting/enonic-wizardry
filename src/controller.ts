@@ -3,6 +3,7 @@ import { Response } from "enonic-types/lib/controller";
 import { localize } from "enonic-fp/lib/i18n";
 import { getOrElse } from 'fp-ts/lib/Option'
 import { IO, io, map } from "fp-ts/lib/IO";
+import {getUnsafeRenderer} from "enonic-fp/lib/thymeleaf";
 
 export const defaultStatusNumbers: { [key in EnonicErrorKey]: number } = {
   "BadRequestError": 400,
@@ -21,7 +22,11 @@ function contentType(body: any): string {
     : 'application/json';
 }
 
-export function status(status: number, body?: string | object): IO<Response> {
+export function status(statusOrError: number | EnonicError, body?: string | object): IO<Response> {
+  const status = (typeof statusOrError == 'number')
+    ? statusOrError
+    : defaultStatusNumbers[statusOrError.errorKey];
+
   return io.of({
     status,
     body,
@@ -29,11 +34,14 @@ export function status(status: number, body?: string | object): IO<Response> {
   })
 }
 
+/**
+ * Creates a Json Response based on an EnonicError
+ */
 export function errorResponse(i18nPrefix: string, debug = false): (err: EnonicError) => IO<Response> {
   return (err: EnonicError): IO<Response> => {
     const i18nKey = `${i18nPrefix}.${err.errorKey}`;
 
-    return status(defaultStatusNumbers[err.errorKey], {
+    return status(err, {
       message: getOrElse(() => i18nKey)(localize({ key: i18nKey })),
       cause: debug && !isBadRequestError(err)
         ? err.cause
@@ -43,6 +51,13 @@ export function errorResponse(i18nPrefix: string, debug = false): (err: EnonicEr
         : undefined
     });
   };
+}
+
+/**
+ * Creates a Response based on a thymeleaf view, and an EnonicError
+ */
+export function renderErrorPage(view: any): (err: EnonicError) => IO<Response> {
+  return (err: EnonicError): IO<Response> => status(err, getUnsafeRenderer<EnonicError>(view));
 }
 
 export const ok = (body: any): IO<Response> => status(200, body);
