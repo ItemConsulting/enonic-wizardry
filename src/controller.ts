@@ -56,7 +56,7 @@ export function errorResponse(i18nPrefix: string, debug = false): (err: EnonicEr
 /**
  * Creates a Response based on a thymeleaf view, and an EnonicError
  */
-export function renderErrorPage(view: any): (err: EnonicError) => IO<Response> {
+export function unsafeRenderErrorPage(view: any): (err: EnonicError) => IO<Response> {
   return (err: EnonicError): IO<Response> => status(err, getUnsafeRenderer<EnonicError>(view));
 }
 
