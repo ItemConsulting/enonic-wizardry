@@ -2,7 +2,7 @@ import { EnonicError, EnonicErrorKey, isBadRequestError } from "enonic-fp/lib/er
 import { Response } from "enonic-types/lib/controller";
 import { localize } from "enonic-fp/lib/i18n";
 import { getOrElse } from 'fp-ts/lib/Option'
-import { IO, io, map } from "fp-ts/lib/IO";
+import { IO, io } from "fp-ts/lib/IO";
 import {getUnsafeRenderer} from "enonic-fp/lib/thymeleaf";
 
 export const defaultStatusNumbers: { [key in EnonicErrorKey]: number } = {
@@ -22,15 +22,16 @@ function contentType(body: any): string {
     : 'application/json';
 }
 
-export function status(statusOrError: number | EnonicError, body?: string | object): IO<Response> {
+export function status(statusOrError: number | EnonicError, body: string | object = '', other: Partial<Response> = {}): IO<Response> {
   const status = (typeof statusOrError == 'number')
     ? statusOrError
     : defaultStatusNumbers[statusOrError.errorKey];
 
   return io.of({
+    contentType: contentType(body),
+    ...other,
     status,
-    body,
-    contentType: contentType(body)
+    body
   })
 }
 
@@ -60,11 +61,15 @@ export function unsafeRenderErrorPage(view: any): (err: EnonicError) => IO<Respo
   return (err: EnonicError): IO<Response> => status(err, getUnsafeRenderer<EnonicError>(view));
 }
 
-export const ok = (body: any): IO<Response> => status(200, body);
+export const ok = (body: any, other: Partial<Response> = {}): IO<Response> => status(200, body, other);
 
-export const created = (body: any): IO<Response> => status(201, body);
+export const created = (body: any, other: Partial<Response> = {}): IO<Response> => status(201, body, other);
 
-export const noContent = (): IO<Response> => io.of<Response>({ status: 204, body: ''});
+export const noContent = (other: Partial<Response> = {}): IO<Response> => io.of<Response>({
+  ...other,
+  status: 204,
+  body: ''
+});
 
 export const redirect = (redirect: string): IO<Response> => io.of<Response>({
   applyFilters: false,
@@ -74,28 +79,16 @@ export const redirect = (redirect: string): IO<Response> => io.of<Response>({
   body: ''
 });
 
-export const badRequest = (body: any): IO<Response> => status(400, body);
+export const badRequest = (body: any, other: Partial<Response> = {}): IO<Response> => status(400, body, other);
 
-export const unauthorized = (body: any): IO<Response> => status(401, body);
+export const unauthorized = (body: any, other: Partial<Response> = {}): IO<Response> => status(401, body, other);
 
-export const forbidden = (body: any): IO<Response> =>  status(403, body);
+export const forbidden = (body: any, other: Partial<Response> = {}): IO<Response> =>  status(403, body, other);
 
-export const notFound = (body: any): IO<Response> =>  status(404, body);
+export const notFound = (body: any, other: Partial<Response> = {}): IO<Response> =>  status(404, body, other);
 
-export const methodNotAllowed = (body: any): IO<Response> =>  status(405, body);
+export const methodNotAllowed = (body: any, other: Partial<Response> = {}): IO<Response> =>  status(405, body, other);
 
-export const internalServerError = (body: any): IO<Response> =>  status(500, body);
+export const internalServerError = (body: any, other: Partial<Response> = {}): IO<Response> =>  status(500, body, other);
 
-export const badGateway = (body: any): IO<Response> =>  status(502, body);
-
-export function setTotal(total: number, response: IO<Response>): IO<Response> {
-  return map((res: Response) => {
-    return {
-      ...res,
-      headers: {
-        ...res.headers,
-        'X-Total-Count': String(total)
-      }
-    };
-  })(response);
-}
+export const badGateway = (body: any, other: Partial<Response> = {}): IO<Response> =>  status(502, body, other);

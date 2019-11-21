@@ -91,7 +91,6 @@ export function get(req: Request): Response { // 2
    * `methodNotAllowed`
    * `internalServerError`
    * `badGateway`
-   * `setTotal`
    
  * [Utils](./src/utils.ts)
    * `substringAfter`
