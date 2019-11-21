@@ -79,6 +79,7 @@ export function get(req: Request): Response { // 2
  * [Controller](./src/controller.ts)
    * `status`
    * `errorResponse`
+   * `unsafeRenderErrorPage`
    * `ok`
    * `created`
    * `noContent`
