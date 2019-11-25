@@ -58,7 +58,7 @@ export function errorResponse(i18nPrefix: string, debug = false): (err: EnonicEr
  * Creates a Response based on a thymeleaf view, and an EnonicError
  */
 export function unsafeRenderErrorPage(view: any): (err: EnonicError) => IO<Response> {
-  return (err: EnonicError): IO<Response> => status(err, getUnsafeRenderer<EnonicError>(view));
+  return (err: EnonicError): IO<Response> => status(err, getUnsafeRenderer<EnonicError>(view)(err));
 }
 
 export const ok = (body: any, other: Partial<Response> = {}): IO<Response> => status(200, body, other);
