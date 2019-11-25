@@ -3,7 +3,8 @@ import { Response } from "enonic-types/lib/controller";
 import { localize } from "enonic-fp/lib/i18n";
 import { getOrElse } from 'fp-ts/lib/Option'
 import { IO, io } from "fp-ts/lib/IO";
-import {getUnsafeRenderer} from "enonic-fp/lib/thymeleaf";
+import { getUnsafeRenderer } from "enonic-fp/lib/thymeleaf";
+import { ResourceKey } from "enonic-types/lib/thymeleaf";
 
 export const defaultStatusNumbers: { [key in EnonicErrorKey]: number } = {
   "BadRequestError": 400,
@@ -57,7 +58,7 @@ export function errorResponse(i18nPrefix: string, debug = false): (err: EnonicEr
 /**
  * Creates a Response based on a thymeleaf view, and an EnonicError
  */
-export function unsafeRenderErrorPage(view: any): (err: EnonicError) => IO<Response> {
+export function unsafeRenderErrorPage(view: ResourceKey): (err: EnonicError) => IO<Response> {
   return (err: EnonicError): IO<Response> => status(err, getUnsafeRenderer<EnonicError>(view)(err));
 }
 
