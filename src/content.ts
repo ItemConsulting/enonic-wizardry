@@ -112,7 +112,7 @@ export function createMediaFromAttachment<A>(params: CreateMediaFromAttachmentPa
       item: getMultipartItem(params.name, params.index, params.errorMessage)
     }),
     filterOrElse(
-      (res) => res.item.fileName?.length !== 0,
+      (res) => (res.item?.fileName?.length ?? 0) > 0,
       () => ({
         errorKey: "BadRequestError",
         errors: {
@@ -125,7 +125,8 @@ export function createMediaFromAttachment<A>(params: CreateMediaFromAttachmentPa
         {
           data,
           parentPath: params.parentPath,
-          name: item.fileName,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          name: item.fileName!, // Handled by predicate above
           mimeType: item.contentType
         }
       )
