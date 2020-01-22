@@ -37,7 +37,7 @@ export interface CreateMediaFromAttachmentParams {
   readonly errorMessage?: string;
 }
 
-export function publishFromDraftToMaster<A>(content: Content<A>): IOEither<EnonicError, Content<A>> {
+export function publishFromDraftToMaster<A extends object>(content: Content<A>): IOEither<EnonicError, Content<A>> {
   return pipe(
     publish({
       keys: [content._id],
@@ -61,7 +61,7 @@ export function publishContentByKey<A>(key: string): (a: A) => IOEither<EnonicEr
   }
 }
 
-export function applyChangesToData<A>(key: string, changes: Partial<A>): ModifyContentParams<A> {
+export function applyChangesToData<A extends object>(key: string, changes: Partial<A>): ModifyContentParams<A> {
   return {
     key,
     editor: (content: Content<A>): Content<A> => (
@@ -77,7 +77,7 @@ export function applyChangesToData<A>(key: string, changes: Partial<A>): ModifyC
   };
 }
 
-export function createAndPublish<A>(params: CreateContentParams<A>): IOEither<EnonicError, Content<A>> {
+export function createAndPublish<A extends object>(params: CreateContentParams<A>): IOEither<EnonicError, Content<A>> {
   return pipe(
     runInDraftContext(create(params)),
     chain(publishFromDraftToMaster)
@@ -91,21 +91,21 @@ export function deleteAndPublish(params: DeleteContentParams): IOEither<EnonicEr
   );
 }
 
-export function modifyAndPublish<A>(key: string, changes: Partial<A>): IOEither<EnonicError, Content<A>> {
+export function modifyAndPublish<A extends object>(key: string, changes: Partial<A>): IOEither<EnonicError, Content<A>> {
   return pipe(
     runInDraftContext(modify(applyChangesToData<A>(key, changes))),
     chain(publishFromDraftToMaster)
   );
 }
 
-export function getContentDataWithId<A>(content: Content<A>): WithId<A> {
+export function getContentDataWithId<A extends object>(content: Content<A>): WithId<A> {
   return {
     ...content.data,
     _id: content._id
   };
 }
 
-export function createMediaFromAttachment<A>(params: CreateMediaFromAttachmentParams): IOEither<EnonicError, Content<A>> {
+export function createMediaFromAttachment<A extends object>(params: CreateMediaFromAttachmentParams): IOEither<EnonicError, Content<A>> {
   return pipe(
     sequenceS(ioEither)({
       data: getMultipartStream(params.name, params.index, params.errorMessage),
