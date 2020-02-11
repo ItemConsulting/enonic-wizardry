@@ -35,14 +35,9 @@ export function getUuidFromPath (path: string): Option<string> {
   );
 }
 
-export function forceArray<A>(data?: A | Array<A> | ReadonlyArray<A>): Array<A> {
-  data = data || [];
-  return Array.isArray(data)
-    ? data
-    : [data];
-}
-
-export function forceReadonlyArray<A>(data?: A | ReadonlyArray<A>): ReadonlyArray<A> {
+export function forceArray<A>(data?: A | Array<A>): Array<A>;
+export function forceArray<A>(data?: A | ReadonlyArray<A>): ReadonlyArray<A>;
+export function forceArray<A>(data?: A | ReadonlyArray<A>): ReadonlyArray<A> {
   data = data || [];
   return Array.isArray(data)
     ? data
