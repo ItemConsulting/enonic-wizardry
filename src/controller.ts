@@ -12,9 +12,10 @@ export const defaultStatusNumbers: { [key in EnonicErrorKey]: number } = {
   "ForbiddenError": 403,
   "NotFoundError": 404,
   "MethodNotAllowedError": 405,
+  "TooManyRequestsError": 429,
   "InternalServerError": 500,
   "BadGatewayError": 502,
-  "PublishError": 500,
+  "PublishError": 500
 };
 
 function contentType(body: any): string {
