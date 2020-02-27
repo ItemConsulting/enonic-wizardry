@@ -11,7 +11,14 @@ import {
 import { runInDraftContext } from './context';
 import { getMultipartItem, getMultipartStream } from "enonic-fp/lib/portal";
 import { sequenceS } from "fp-ts/lib/Apply";
-import { Content, CreateContentParams, DeleteContentParams, ModifyContentParams } from "enonic-types/lib/content";
+import {
+  ByteSource,
+  Content,
+  CreateContentParams,
+  DeleteContentParams,
+  ModifyContentParams
+} from "enonic-types/lib/content";
+import {MultipartItem} from "enonic-types/lib/portal";
 
 export type WithId<T> = T & { _id: string }
 
@@ -108,11 +115,11 @@ export function getContentDataWithId<A extends object>(content: Content<A>): Wit
 export function createMediaFromAttachment<A extends object>(params: CreateMediaFromAttachmentParams): IOEither<EnonicError, Content<A>> {
   return pipe(
     sequenceS(ioEither)({
-      data: getMultipartStream(params.name, params.index, params.errorMessage),
-      item: getMultipartItem(params.name, params.index, params.errorMessage)
+      data: getMultipartStream(params.name, params.index),
+      item: getMultipartItem(params.name, params.index)
     }),
     filterOrElse(
-      (res) => (res.item?.fileName?.length ?? 0) > 0,
+      hasDataAndItem,
       () => ({
         errorKey: "BadRequestError",
         errors: {
@@ -120,16 +127,25 @@ export function createMediaFromAttachment<A extends object>(params: CreateMediaF
         }
       } as EnonicError)
     ),
-    chain(({ data, item }) =>
+    chain(({ data, item }: AttachmentDataAndItem) =>
       createMedia(
         {
           data,
           parentPath: params.parentPath,
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           name: item.fileName!, // Handled by predicate above
-          mimeType: item.contentType
+          mimeType: item?.contentType
         }
       )
     )
   );
+}
+
+function hasDataAndItem(attachment: Partial<AttachmentDataAndItem>): attachment is AttachmentDataAndItem {
+  return (attachment.data !== undefined) && ((attachment.item?.fileName?.length ?? 0) > 0);
+}
+
+interface AttachmentDataAndItem {
+  readonly data: ByteSource;
+  readonly item: MultipartItem;
 }
