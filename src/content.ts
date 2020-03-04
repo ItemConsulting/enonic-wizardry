@@ -19,6 +19,7 @@ import {
   ModifyContentParams
 } from "enonic-types/lib/content";
 import {MultipartItem} from "enonic-types/lib/portal";
+import {tupled} from "fp-ts/lib/function";
 
 export type WithId<T> = T & { _id: string }
 
@@ -98,11 +99,21 @@ export function deleteAndPublish(params: DeleteContentParams): IOEither<EnonicEr
   );
 }
 
-export function modifyAndPublish<A extends object>(key: string, changes: Partial<A>): IOEither<EnonicError, Content<A>> {
+export function modifyAndPublish<A extends object>(a: WithId<A>): IOEither<EnonicError, Content<A>>;
+export function modifyAndPublish<A extends object>(a: Partial<A>, key: string): IOEither<EnonicError, Content<A>>;
+export function modifyAndPublish<A extends object>(a: Partial<A> | WithId<A>, key?: string): IOEither<EnonicError, Content<A>> {
+  const doModify: IOEither<EnonicError, Content<A>> = isDataWithId(a)
+    ? modify(tupled(applyChangesToData)(splitDataWithId<A>(a)))
+    : modify(applyChangesToData<A>(key ?? '', a));
+
   return pipe(
-    runInDraftContext(modify(applyChangesToData<A>(key, changes))),
+    runInDraftContext(doModify),
     chain(publishFromDraftToMaster)
   );
+}
+
+export function isDataWithId<A>(data: any): data is WithId<A> {
+  return data?._id !== undefined;
 }
 
 export function getContentDataWithId<A extends object>(content: Content<A>): WithId<A> {
@@ -110,6 +121,11 @@ export function getContentDataWithId<A extends object>(content: Content<A>): Wit
     ...content.data,
     _id: content._id
   };
+}
+
+export function splitDataWithId<A extends object>(a: A & { _id: string }): [string, A] {
+  const { _id, ...data } = a;
+  return [_id, data as A];
 }
 
 export function createMediaFromAttachment<A extends object>(params: CreateMediaFromAttachmentParams): IOEither<EnonicError, Content<A>> {
