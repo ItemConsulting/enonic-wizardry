@@ -1,16 +1,10 @@
-import { EnonicError } from "enonic-fp/lib/errors";
-import { chain, filterOrElse, ioEither, IOEither, map } from "fp-ts/lib/IOEither";
-import { pipe } from "fp-ts/lib/pipeable";
-import {
-  publish,
-  create,
-  remove,
-  modify,
-  createMedia
-} from "enonic-fp/lib/content";
-import { runInDraftContext } from './context';
-import { getMultipartItem, getMultipartStream } from "enonic-fp/lib/portal";
-import { sequenceS } from "fp-ts/lib/Apply";
+import {EnonicError} from "enonic-fp/lib/errors";
+import {chain, filterOrElse, ioEither, IOEither, map} from "fp-ts/lib/IOEither";
+import {pipe} from "fp-ts/lib/pipeable";
+import {create, createMedia, modify, publish, remove} from "enonic-fp/lib/content";
+import {runInDraftContext} from './context';
+import {getMultipartItem, getMultipartStream} from "enonic-fp/lib/portal";
+import {sequenceS} from "fp-ts/lib/Apply";
 import {
   ByteSource,
   Content,
@@ -19,7 +13,10 @@ import {
   ModifyContentParams
 } from "enonic-types/lib/content";
 import {MultipartItem} from "enonic-types/lib/portal";
-import {tupled} from "fp-ts/lib/function";
+import {identity, tupled} from "fp-ts/lib/function";
+import {array} from "fp-ts/lib/Array";
+import {Separated} from "fp-ts/lib/Compactable";
+import {IO, io} from "fp-ts/lib/IO";
 
 export type WithId<T> = T & { _id: string }
 
@@ -57,7 +54,7 @@ export function publishFromDraftToMaster<A extends object>(content: Content<A>):
 }
 
 export function publishContentByKey<A>(key: string): (a: A) => IOEither<EnonicError, A> {
-  return (a): IOEither<EnonicError, A> => {
+  return (a: A): IOEither<EnonicError, A> => {
     return pipe(
       publish({
         keys: [key],
@@ -69,7 +66,7 @@ export function publishContentByKey<A>(key: string): (a: A) => IOEither<EnonicEr
   }
 }
 
-export function applyChangesToData<A extends object>(key: string, changes: Partial<A>): ModifyContentParams<A> {
+export function applyChangesToData<A extends object>(key: string, changes: Partial<A>): ModifyContentParams<A> {
   return {
     key,
     editor: (content: Content<A>): Content<A> => (
@@ -83,6 +80,13 @@ export function applyChangesToData<A extends object>(key: string, changes: Parti
     ),
     requireValid: true
   };
+}
+
+export function createAll<A extends object>(paramsList: Array<CreateContentParams<A>>): IO<Separated<Array<EnonicError>, Array<Content<A>>>> {
+  return array.wilt(io)(
+    paramsList.map(create),
+    identity
+  );
 }
 
 export function createAndPublish<A extends object>(params: CreateContentParams<A>): IOEither<EnonicError, Content<A>> {
@@ -124,7 +128,7 @@ export function getContentDataWithId<A extends object>(content: Content<A>): Wit
 }
 
 export function splitDataWithId<A extends object>(a: A & { _id: string }): [string, A] {
-  const { _id, ...data } = a;
+  const {_id, ...data} = a;
   return [_id, data as A];
 }
 
@@ -143,7 +147,7 @@ export function createMediaFromAttachment<A extends object>(params: CreateMediaF
         }
       } as EnonicError)
     ),
-    chain(({ data, item }: AttachmentDataAndItem) =>
+    chain(({data, item}: AttachmentDataAndItem) =>
       createMedia(
         {
           data,
