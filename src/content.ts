@@ -116,8 +116,8 @@ export function modifyAndPublish<A extends object>(a: Partial<A> | WithId<A>, ke
   );
 }
 
-export function isDataWithId<A>(data: any): data is WithId<A> {
-  return data?._id !== undefined;
+export function isDataWithId<A>(data: unknown | WithId<A>): data is WithId<A> {
+  return (data as WithId<A>)?._id !== undefined;
 }
 
 export function getContentDataWithId<A extends object>(content: Content<A>): WithId<A> {

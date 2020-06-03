@@ -1,10 +1,10 @@
-import { EnonicError, EnonicErrorKey, isBadRequestError } from "enonic-fp/lib/errors";
-import { Response } from "enonic-types/lib/controller";
-import { localize } from "enonic-fp/lib/i18n";
-import { getOrElse } from 'fp-ts/lib/Option'
-import { IO, io } from "fp-ts/lib/IO";
-import { getUnsafeRenderer } from "enonic-fp/lib/thymeleaf";
-import { ResourceKey } from "enonic-types/lib/thymeleaf";
+import {EnonicError, EnonicErrorKey, isBadRequestError} from "enonic-fp/lib/errors";
+import {Response, ResponseType} from "enonic-types/lib/controller";
+import {localize} from "enonic-fp/lib/i18n";
+import {getOrElse} from 'fp-ts/lib/Option'
+import {IO, io} from "fp-ts/lib/IO";
+import {getUnsafeRenderer} from "enonic-fp/lib/thymeleaf";
+import {ResourceKey} from "enonic-types/lib/thymeleaf";
 
 export const defaultStatusNumbers: { [key in EnonicErrorKey]: number } = {
   "BadRequestError": 400,
@@ -18,13 +18,13 @@ export const defaultStatusNumbers: { [key in EnonicErrorKey]: number } = {
   "PublishError": 500
 };
 
-function contentType(body: any): string {
+function contentType(body: ResponseType): string {
   return (typeof body === "string")
     ? 'text/html'
     : 'application/json';
 }
 
-export function status(statusOrError: number | EnonicError, body: string | object = '', other: Partial<Response> = {}): IO<Response> {
+export function status(statusOrError: number | EnonicError, body: ResponseType = '', other: Partial<Response> = {}): IO<Response> {
   const status = (typeof statusOrError == 'number')
     ? statusOrError
     : defaultStatusNumbers[statusOrError.errorKey];
@@ -63,9 +63,9 @@ export function unsafeRenderErrorPage(view: ResourceKey): (err: EnonicError) => 
   return (err: EnonicError): IO<Response> => status(err, getUnsafeRenderer<EnonicError>(view)(err));
 }
 
-export const ok = (body: any, other: Partial<Response> = {}): IO<Response> => status(200, body, other);
+export const ok = (body: ResponseType, other: Partial<Response> = {}): IO<Response> => status(200, body, other);
 
-export const created = (body: any, other: Partial<Response> = {}): IO<Response> => status(201, body, other);
+export const created = (body: ResponseType, other: Partial<Response> = {}): IO<Response> => status(201, body, other);
 
 export const noContent = (other: Partial<Response> = {}): IO<Response> => io.of<Response>({
   ...other,
@@ -81,16 +81,16 @@ export const redirect = (redirect: string): IO<Response> => io.of<Response>({
   body: ''
 });
 
-export const badRequest = (body: any, other: Partial<Response> = {}): IO<Response> => status(400, body, other);
+export const badRequest = (body: ResponseType, other: Partial<Response> = {}): IO<Response> => status(400, body, other);
 
-export const unauthorized = (body: any, other: Partial<Response> = {}): IO<Response> => status(401, body, other);
+export const unauthorized = (body: ResponseType, other: Partial<Response> = {}): IO<Response> => status(401, body, other);
 
-export const forbidden = (body: any, other: Partial<Response> = {}): IO<Response> =>  status(403, body, other);
+export const forbidden = (body: ResponseType, other: Partial<Response> = {}): IO<Response> =>  status(403, body, other);
 
-export const notFound = (body: any, other: Partial<Response> = {}): IO<Response> =>  status(404, body, other);
+export const notFound = (body: ResponseType, other: Partial<Response> = {}): IO<Response> =>  status(404, body, other);
 
-export const methodNotAllowed = (body: any, other: Partial<Response> = {}): IO<Response> =>  status(405, body, other);
+export const methodNotAllowed = (body: ResponseType, other: Partial<Response> = {}): IO<Response> =>  status(405, body, other);
 
-export const internalServerError = (body: any, other: Partial<Response> = {}): IO<Response> =>  status(500, body, other);
+export const internalServerError = (body: ResponseType, other: Partial<Response> = {}): IO<Response> =>  status(500, body, other);
 
-export const badGateway = (body: any, other: Partial<Response> = {}): IO<Response> =>  status(502, body, other);
+export const badGateway = (body: ResponseType, other: Partial<Response> = {}): IO<Response> =>  status(502, body, other);
