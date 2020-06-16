@@ -92,7 +92,7 @@ export function get(req: Request): Response { // 2
    * `internalServerError`
    * `badGateway`
    
- * [Utils](./src/utils.ts)
+ * [Utils](src/array.ts)
    * `substringAfter`
    * `json`
    * `getUuidFromPath`
