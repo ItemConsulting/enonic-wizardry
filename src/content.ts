@@ -1,7 +1,7 @@
 import {EnonicError} from "enonic-fp/lib/errors";
-import {chain, filterOrElse, ioEither, IOEither, map} from "fp-ts/lib/IOEither";
+import {chain, filterOrElse, ioEither, IOEither, map, right} from "fp-ts/lib/IOEither";
 import {pipe} from "fp-ts/lib/pipeable";
-import {create, createMedia, modify, publish, remove} from "enonic-fp/lib/content";
+import {create, createMedia, modify, publish, query, remove} from "enonic-fp/lib/content";
 import {runInDraftContext} from './context';
 import {getMultipartItem, getMultipartStream} from "enonic-fp/lib/portal";
 import {sequenceS} from "fp-ts/lib/Apply";
@@ -10,13 +10,52 @@ import {
   Content,
   CreateContentParams,
   DeleteContentParams,
-  ModifyContentParams
+  ModifyContentParams, QueryResponse
 } from "enonic-types/lib/content";
 import {MultipartItem} from "enonic-types/lib/portal";
 import {identity} from "fp-ts/lib/function";
 import {array} from "fp-ts/lib/Array";
 import {Separated} from "fp-ts/lib/Compactable";
 import {IO, io} from "fp-ts/lib/IO";
+
+export function getContentByIds<A extends object>(ids: Array<string>): IOEither<EnonicError, ReadonlyArray<Content<A>>>;
+export function getContentByIds<A extends object>(ids: Array<string | undefined>): IOEither<EnonicError, ReadonlyArray<Content<A> | undefined>>;
+export function getContentByIds<A extends object>(ids: Array<string | undefined>): IOEither<EnonicError, ReadonlyArray<Content<A> | undefined>> {
+  return(ids.length > 0)
+    ? pipe(
+      query<A>(
+        {
+          count: ids.length,
+          query: `_id IN (${idsAsString(ids)})`
+        }
+      ),
+      map((result: QueryResponse<A>) => sortResultByIdOrder(result.hits, ids))
+    )
+    : right([]);
+}
+
+function idsAsString(ids: Array<string | undefined>): string {
+  return ids
+    .filter(notEmptyOrUndefined)
+    .map((id)=>`"${id}"`)
+    .join(',');
+}
+
+function sortResultByIdOrder<A extends object>(hits: ReadonlyArray<Content<A>>, ids: Array<string | undefined>)
+  : ReadonlyArray<Content<A>> {
+
+  return hits.reduce((result: Array<Content<A>>, content: Content<A>) => {
+    const originalIndex = ids.indexOf(content._id);
+    result[originalIndex] = content;
+    return result;
+  }, []);
+}
+
+function notEmptyOrUndefined(str?: string): str is string {
+  return (str !== undefined)
+    && (str !== null)
+    && (str.length > 0)
+}
 
 export interface CreateMediaFromAttachmentParams {
   /**
