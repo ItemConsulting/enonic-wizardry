@@ -1,22 +1,21 @@
-  import {fold, map} from "fp-ts/lib/IOEither";
-  import { pipe } from "fp-ts/lib/pipeable";
-  import { Request, Response } from "enonic-types/lib/controller";
-  import { get as getContent } from "enonic-fp/lib/content";
-  import { errorResponse, ok } from "../controller";
-  import { Article } from "../../site/content-types/article/article";
-  import { getContentDataWithId } from "../content"; // 1
+import {fold} from "fp-ts/lib/IOEither";
+import {pipe} from "fp-ts/lib/pipeable";
+import {Request, Response} from "enonic-types/controller";
+import {errorResponse, ok} from "enonic-fp/controller";
+import {Article} from "../../site/content-types/article/article";
+import {getContentByIds} from "../content";
+import {forceArray} from "enonic-fp/array";
 
-  export function get(req: Request): Response { // 2
-    const program = pipe( // 3
-      getContent<Article>({ // 4
-        key: req.params.key!
-      }),
-      map(getContentDataWithId), // 5
-      fold( // 6
-        errorResponse('article.error'), // 7
-        ok // 8
-      )
-    );
+export function get(req: Request): Response { // 2
+  const keys: Array<string> = forceArray(req.params.key) // ["key1", "key2", "key3"]
 
-    return program(); // 9
-  }
+  const program = pipe( // 3
+    getContentByIds<Article>(keys),
+    fold( // 6
+      errorResponse(req), // 7
+      ok // 8
+    )
+  );
+
+  return program(); // 9
+}
