@@ -1,17 +1,12 @@
-import { run } from "enonic-fp/lib/context";
-import { IO } from "fp-ts/lib/IO";
+import {run} from "enonic-fp/context";
 
-export function runAsSuperUser<A>(a: IO<A>): IO<A> {
-  return run<A>({
-    user: {
-      login: "su",
-      idProvider: 'system'
-    }
-  })(a);
-}
+export const runAsSuperUser = run({
+  user: {
+    login: "su",
+    idProvider: 'system'
+  }
+});
 
-export function runInDraftContext<A>(a: IO<A>): IO<A> {
-  return run<A>({
-    branch: 'draft'
-  })(a);
-}
+export const runInDraftContext = run({
+  branch: 'draft'
+});

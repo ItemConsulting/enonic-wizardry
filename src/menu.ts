@@ -1,13 +1,15 @@
-import {chain, IOEither, right} from "fp-ts/lib/IOEither";
-import {MenuItem} from "enonic-types/lib/menu";
-import {get as getContent} from "enonic-fp/lib/content";
-import {getSubMenus} from "enonic-fp/lib/menu";
-import {EnonicError} from "enonic-fp/lib/errors";
+import {chain, IOEither, right} from "fp-ts/IOEither";
+import {MenuItem} from "enonic-types/menu";
+import {get as getContent} from "enonic-fp/content";
+import {getSubMenus} from "enonic-fp/menu";
+import {EnonicError} from "enonic-fp/errors";
+import {pipe} from "fp-ts/pipeable";
 
 export function getSubMenuByKey(levels: number, key?: string): IOEither<EnonicError, ReadonlyArray<MenuItem>> {
-  return key
-    ? chain(
-      getSubMenus(levels)
-    )(getContent({ key }))
+  return (key !== undefined)
+    ? pipe(
+        getContent({ key }),
+        chain(getSubMenus(levels))
+      )
     : right([]);
 }
