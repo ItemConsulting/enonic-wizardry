@@ -5,7 +5,7 @@ import {RunContext} from "enonic-types/context";
 export function chainRun(runContext: RunContext)
   : <E, A, B>(f: (a: A) => IOEither<E, B>) => (ma: IOEither<E, A>) => IOEither<E, B> {
 
-  return <E, A, B>(f: (a: A) => IOEither<E, B>) => chain((a: A) => run(runContext)(f(a)))
+  return <E, A, B>(f: (a: A) => IOEither<E, B>) => chain<E, A, B>((a: A) => run(runContext)(f(a)))
 }
 
 export const runAsSuperUser = run({
