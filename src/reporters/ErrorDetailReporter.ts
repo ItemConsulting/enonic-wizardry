@@ -55,6 +55,9 @@ function getMessageKeys(key: string, fieldIsEmpty: boolean, i18nPrefix?: string)
     .concat(defaultMessageKeys);
 }
 
+/**
+ * Used for i18n to differenciate empty value
+ */
 function isLastEmpty(context: Context): boolean {
   const entries = context.filter(c => c.key !== "");
   const last = entries[entries.length - 1];
