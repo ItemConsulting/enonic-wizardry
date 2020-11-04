@@ -32,15 +32,15 @@ export interface RegexpValidatedStringProps<A extends boolean = false> {
   readonly isNullable?: A;
 }
 
-export function RegexpValidatedString<A extends string>(props: RegexpValidatedStringProps): t.Type<A, A, unknown>;
-export function RegexpValidatedString<A extends string | undefined>(props: RegexpValidatedStringProps<true>): t.Type<A, A, unknown>;
-export function RegexpValidatedString({ regexp, isNullable = false }: RegexpValidatedStringProps<boolean>): t.Type<undefined | string, undefined | string, unknown> {
-  return new t.Type<undefined | string, undefined | string, unknown>(
+export function RegexpValidatedString(props: RegexpValidatedStringProps): t.Type<string, string>;
+export function RegexpValidatedString(props: RegexpValidatedStringProps<true>): t.Type<string | undefined, string | undefined>;
+export function RegexpValidatedString<A extends string | undefined>({ regexp, isNullable = false }: RegexpValidatedStringProps<boolean>): t.Type<A, A> {
+  return new t.Type<A, A, unknown>(
     'RegexpValidatedString',
-    (u): u is string | undefined => (typeof u === "string" && regexp.test(u)) || (isNullable && u === undefined),
+    (u): u is A => (typeof u === "string" && regexp.test(u)) || (isNullable && u === undefined),
     (u, c) => {
       return (typeof u === "string" && regexp.test(u)) || (isNullable && u === undefined)
-        ? t.success(u)
+        ? t.success(u as A)
         : t.failure(u, c);
     },
     t.identity
@@ -52,15 +52,15 @@ export interface MaxLengthValidatedStringProps<A extends boolean = false> {
   readonly isNullable?: A;
 }
 
-export function MaxLengthValidatedString<A extends string>(props: MaxLengthValidatedStringProps): t.Type<A, A, unknown>;
-export function MaxLengthValidatedString<A extends string | undefined>(props: MaxLengthValidatedStringProps<true>): t.Type<A, A, unknown>;
-export function MaxLengthValidatedString({ maxLength, isNullable = false }: MaxLengthValidatedStringProps<boolean>): t.Type<string | undefined, string | undefined, unknown> {
-  return new t.Type<string | undefined, string | undefined, unknown>(
+export function MaxLengthValidatedString(props: MaxLengthValidatedStringProps): t.Type<string, string>;
+export function MaxLengthValidatedString(props: MaxLengthValidatedStringProps<true>): t.Type<string | undefined, string | undefined>;
+export function MaxLengthValidatedString<A extends string | undefined>({ maxLength, isNullable = false }: MaxLengthValidatedStringProps<boolean>): t.Type<A, A> {
+  return new t.Type<A, A, unknown>(
     'MaxLengthValidatedString',
-    (u): u is string => (typeof u === "string" && u.length <= maxLength) || (isNullable && u === undefined),
+    (u): u is A => (typeof u === "string" && u.length <= maxLength) || (isNullable && u === undefined),
     (u, c) => {
       return (typeof u === "string" && u.length <= maxLength) || (isNullable && u === undefined)
-        ? t.success(u)
+        ? t.success(u as A)
         : t.failure(u, c)
     },
     t.identity
@@ -73,15 +73,15 @@ export interface MinMaxValidatedNumberProps<A extends boolean = false> {
   readonly isNullable?: A;
 }
 
-export function MinMaxValidatedNumber<A extends number>(props: MinMaxValidatedNumberProps): t.Type<A, A, unknown>;
-export function MinMaxValidatedNumber<A extends number | undefined>(props: MinMaxValidatedNumberProps<true>): t.Type<A, A, unknown>;
-export function MinMaxValidatedNumber ({ min = Number.NEGATIVE_INFINITY, max = Number.POSITIVE_INFINITY, isNullable = false }: MinMaxValidatedNumberProps<boolean>): t.Type<number | undefined, number | undefined, unknown> {
-  return new t.Type<number | undefined, number | undefined, unknown>(
+export function MinMaxValidatedNumber(props: MinMaxValidatedNumberProps): t.Type<string, string>;
+export function MinMaxValidatedNumber(props: MinMaxValidatedNumberProps<true>): t.Type<string | undefined, string | undefined>;
+export function MinMaxValidatedNumber<A extends number | undefined>({ min = Number.NEGATIVE_INFINITY, max = Number.POSITIVE_INFINITY, isNullable = false }: MinMaxValidatedNumberProps<boolean>): t.Type<A, A> {
+  return new t.Type<A, A, unknown>(
     'MinMaxValidatedNumber',
-    (u): u is number => (t.number.is(u) && (min <= u) && (u <= max)) || (isNullable && u === undefined),
+    (u): u is A => (t.number.is(u) && (min <= u) && (u <= max)) || (isNullable && u === undefined),
     (u, c) => {
       return (t.number.is(u) && (min <= u) && (u <= max)) || (isNullable && u === undefined)
-        ? t.success(u)
+        ? t.success(u as A)
         : t.failure(u, c)
     },
     t.identity
