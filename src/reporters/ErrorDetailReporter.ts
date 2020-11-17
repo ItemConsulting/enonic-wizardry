@@ -5,21 +5,27 @@ import {ErrorDetail} from "enonic-fp/errors";
 import {localizeFirst} from "enonic-fp/i18n";
 import {pipe} from "fp-ts/pipeable";
 import {getOrElse} from "fp-ts/Option";
+import {LocalizeParams} from "enonic-types/i18n";
 
-export function getErrorDetailReporter(i18nKey?: string): Reporter<Array<ErrorDetail>> {
+export interface GetErrorDetailReporterParams {
+  readonly i18nPrefix?: string;
+  readonly localizeParams?: LocalizeParams;
+}
+
+export function getErrorDetailReporter(params: GetErrorDetailReporterParams = {}): Reporter<Array<ErrorDetail>> {
   return {
     report: fold(
-      (es) => es.map(err => validationErrorToErrorDetail(err, i18nKey)),
+      (es) => es.map(err => validationErrorToErrorDetail(err, params)),
       () => []
     )
   }
 }
 
-function validationErrorToErrorDetail(err: ValidationError, i18nPrefix = "errors"): ErrorDetail {
+function validationErrorToErrorDetail(err: ValidationError, params: GetErrorDetailReporterParams): ErrorDetail {
   const key = getPathInInterface(err.context);
 
   return pipe(
-    getMessageKeys(key, isLastEmpty(err.context), i18nPrefix),
+    getMessageKeys(key, isLastEmpty(err.context), params),
     localizeFirst,
     getOrElse(() => err.message ?? 'Invalid value'),
     (message) => (
@@ -31,7 +37,9 @@ function validationErrorToErrorDetail(err: ValidationError, i18nPrefix = "errors
   );
 }
 
-function getMessageKeys(key: string, fieldIsEmpty: boolean, i18nPrefix?: string) {
+function getMessageKeys(key: string, fieldIsEmpty: boolean, params: GetErrorDetailReporterParams): Array<LocalizeParams> {
+  const i18nPrefix = params.i18nPrefix ?? "errors";
+
   const keyedMessageKeys = [
     `${i18nPrefix}.bad-request-error.${key}`,
     `${i18nPrefix}.400.${key}`,
@@ -52,7 +60,13 @@ function getMessageKeys(key: string, fieldIsEmpty: boolean, i18nPrefix?: string)
 
   return keyedMessageKeys
     .concat(fieldIsEmpty ? emptyMessageKeys : [])
-    .concat(defaultMessageKeys);
+    .concat(defaultMessageKeys)
+    .map(key => (
+      {
+        ...params.localizeParams,
+        key
+      }
+    ));
 }
 
 /**

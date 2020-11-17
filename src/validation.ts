@@ -1,12 +1,12 @@
 import {Errors, Type} from 'io-ts';
 import * as t from 'io-ts';
 import {Either} from 'fp-ts/Either'
-import {getErrorDetailReporter} from "./reporters/ErrorDetailReporter";
+import {getErrorDetailReporter, GetErrorDetailReporterParams} from "./reporters/ErrorDetailReporter";
 import {badRequestError, EnonicError} from 'enonic-fp/errors';
 import {fromEither, IOEither, mapLeft} from "fp-ts/IOEither";
 import {pipe} from "fp-ts/pipeable";
 
-export function validate<A, O = A, I = unknown>(a: Type<A, O, I>, params?: ValidateParams): (i: I) => IOEither<EnonicError, A> {
+export function validate<A, O = A, I = unknown>(a: Type<A, O, I>, params?: GetErrorDetailReporterParams): (i: I) => IOEither<EnonicError, A> {
   return (i: I): IOEither<EnonicError, A> => {
     const decoded: Either<Errors, A> = a.decode(i);
 
@@ -16,15 +16,11 @@ export function validate<A, O = A, I = unknown>(a: Type<A, O, I>, params?: Valid
       mapLeft(() => (
         {
           ...badRequestError,
-          errors: getErrorDetailReporter(params?.i18nPrefix).report(decoded)
+          errors: getErrorDetailReporter(params).report(decoded)
         }
       ))
     )
   };
-}
-
-export interface ValidateParams {
-  readonly i18nPrefix?: string;
 }
 
 export interface RegexpValidatedStringProps<A extends boolean = false> {
