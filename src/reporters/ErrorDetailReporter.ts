@@ -2,14 +2,14 @@ import {Context, ValidationError} from 'io-ts';
 import {Reporter} from "io-ts/lib/Reporter";
 import {fold} from 'fp-ts/Either';
 import {ErrorDetail} from "enonic-fp/errors";
+import {LocalizeWithPrefixParams} from "enonic-fp/controller";
 import {localizeFirst} from "enonic-fp/i18n";
 import {pipe} from "fp-ts/pipeable";
 import {getOrElse} from "fp-ts/Option";
 import {LocalizeParams} from "enonic-types/i18n";
 
 export interface GetErrorDetailReporterParams {
-  readonly i18nPrefix?: string;
-  readonly localizeParams?: LocalizeParams;
+  readonly localizeParams?: LocalizeWithPrefixParams;
 }
 
 export function getErrorDetailReporter(params: GetErrorDetailReporterParams = {}): Reporter<Array<ErrorDetail>> {
@@ -38,7 +38,7 @@ function validationErrorToErrorDetail(err: ValidationError, params: GetErrorDeta
 }
 
 function getMessageKeys(key: string, fieldIsEmpty: boolean, params: GetErrorDetailReporterParams): Array<LocalizeParams> {
-  const i18nPrefix = params.i18nPrefix ?? "errors";
+  const i18nPrefix = params.localizeParams?.i18nPrefix ?? "errors";
 
   const keyedMessageKeys = [
     `${i18nPrefix}.bad-request-error.${key}`,
