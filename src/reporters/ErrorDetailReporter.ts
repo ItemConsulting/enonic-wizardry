@@ -8,24 +8,20 @@ import {pipe} from "fp-ts/pipeable";
 import {getOrElse} from "fp-ts/Option";
 import {LocalizeParams} from "enonic-types/i18n";
 
-export interface GetErrorDetailReporterParams {
-  readonly localizeParams?: LocalizeWithPrefixParams;
-}
-
-export function getErrorDetailReporter(params: GetErrorDetailReporterParams = {}): Reporter<Array<ErrorDetail>> {
+export function getErrorDetailReporter(localizeParams?: LocalizeWithPrefixParams): Reporter<Array<ErrorDetail>> {
   return {
     report: fold(
-      (es) => es.map(err => validationErrorToErrorDetail(err, params)),
+      (es) => es.map(err => validationErrorToErrorDetail(err, localizeParams)),
       () => []
     )
   }
 }
 
-function validationErrorToErrorDetail(err: ValidationError, params: GetErrorDetailReporterParams): ErrorDetail {
+function validationErrorToErrorDetail(err: ValidationError, localizeParams?: LocalizeWithPrefixParams): ErrorDetail {
   const key = getPathInInterface(err.context);
 
   return pipe(
-    getMessageKeys(key, isLastEmpty(err.context), params),
+    getMessageKeys(key, isLastEmpty(err.context), localizeParams),
     localizeFirst,
     getOrElse(() => err.message ?? 'Invalid value'),
     (message) => (
@@ -37,8 +33,8 @@ function validationErrorToErrorDetail(err: ValidationError, params: GetErrorDeta
   );
 }
 
-function getMessageKeys(key: string, fieldIsEmpty: boolean, params: GetErrorDetailReporterParams): Array<LocalizeParams> {
-  const i18nPrefix = params.localizeParams?.i18nPrefix ?? "errors";
+function getMessageKeys(key: string, fieldIsEmpty: boolean, localizeParams?: LocalizeWithPrefixParams): Array<LocalizeParams> {
+  const i18nPrefix = localizeParams?.i18nPrefix ?? "errors";
 
   const keyedMessageKeys = [
     `${i18nPrefix}.bad-request-error.${key}`,
@@ -63,7 +59,7 @@ function getMessageKeys(key: string, fieldIsEmpty: boolean, params: GetErrorDeta
     .concat(defaultMessageKeys)
     .map(key => (
       {
-        ...params.localizeParams,
+        ...localizeParams,
         key
       }
     ));

@@ -1,26 +1,27 @@
 import {Errors, Type} from 'io-ts';
 import * as t from 'io-ts';
 import {Either} from 'fp-ts/Either'
-import {getErrorDetailReporter, GetErrorDetailReporterParams} from "./reporters/ErrorDetailReporter";
+import {getErrorDetailReporter} from "./reporters/ErrorDetailReporter";
 import {badRequestError, EnonicError} from 'enonic-fp/errors';
 import {fromEither, IOEither, mapLeft} from "fp-ts/IOEither";
 import {pipe} from "fp-ts/pipeable";
+import {LocalizeWithPrefixParams} from "enonic-fp/controller";
 
-export function validate<A, O = A, I = unknown>(a: Type<A, O, I>, params?: GetErrorDetailReporterParams): (i: I) => IOEither<EnonicError, A> {
-  return (i: I): IOEither<EnonicError, A> => {
-    const decoded: Either<Errors, A> = a.decode(i);
+export function validate<A, O = A, I = unknown>(a: Type<A, O, I>, localizeParams?: LocalizeWithPrefixParams): (i: I) => IOEither<EnonicError, A> {
+  return (i: I): IOEither<EnonicError, A> => normalizeDecoded(a.decode(i), localizeParams);
+}
 
-    return pipe(
-      decoded,
-      fromEither,
-      mapLeft(() => (
-        {
-          ...badRequestError,
-          errors: getErrorDetailReporter(params).report(decoded)
-        }
-      ))
-    )
-  };
+export function normalizeDecoded<A>(decoded: Either<Errors, A>, localizeParams?: LocalizeWithPrefixParams): IOEither<EnonicError, A> {
+  return pipe(
+    decoded,
+    fromEither,
+    mapLeft(() => (
+      {
+        ...badRequestError,
+        errors: getErrorDetailReporter(localizeParams).report(decoded)
+      }
+    ))
+  );
 }
 
 export interface RegexpValidatedStringProps<A extends boolean = false> {

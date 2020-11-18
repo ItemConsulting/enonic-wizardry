@@ -1,7 +1,7 @@
 {
   "name": "enonic-wizardry",
   "sideEffects": false,
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "Functional utility library for Enonic XP",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -26,14 +26,14 @@
   },
   "homepage": "https://github.com/ItemConsulting/enonic-wizardry#readme",
   "dependencies": {
-    "enonic-fp": "^0.3.4",
+    "enonic-fp": "^0.3.5",
     "enonic-types": "^0.1.4",
     "fp-ts": "^2.8.6",
     "io-ts": "^2.2.12"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.8.0",
-    "@typescript-eslint/parser": "^4.8.0",
+    "@typescript-eslint/eslint-plugin": "^4.8.1",
+    "@typescript-eslint/parser": "^4.8.1",
     "eslint": "^7.13.0",
     "rimraf": "^3.0.2",
     "typescript": "^4.0.5"
