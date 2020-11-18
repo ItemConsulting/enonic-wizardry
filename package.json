@@ -1,7 +1,7 @@
 {
   "name": "enonic-wizardry",
   "sideEffects": false,
-  "version": "0.3.8",
+  "version": "0.3.9",
   "description": "Functional utility library for Enonic XP",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",

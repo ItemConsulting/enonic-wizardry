@@ -1,7 +1,7 @@
-import {badRequestError, EnonicError} from "enonic-fp/errors";
+import {badRequestError, EnonicError, notFoundError} from "enonic-fp/errors";
 import {chain, chainFirst, filterOrElse, ioEither, IOEither, map, right} from "fp-ts/IOEither";
 import {pipe} from "fp-ts/pipeable";
-import {create, createMedia, modify, publish, query, remove} from "enonic-fp/content";
+import {create, createMedia, get, modify, publish, query, remove} from "enonic-fp/content";
 import {runInDraftContext} from './context';
 import {getMultipartItem, getMultipartStream} from "enonic-fp/portal";
 import {sequenceS} from "fp-ts/Apply";
@@ -10,6 +10,7 @@ import {
   Content,
   CreateContentParams,
   DeleteContentParams,
+  GetContentParams,
   ModifyContentParams,
   QueryResponse
 } from "enonic-types/content";
@@ -18,6 +19,20 @@ import {identity} from "fp-ts/function";
 import {array} from "fp-ts/Array";
 import {Separated} from "fp-ts/Compactable";
 import {IO, io} from "fp-ts/IO";
+import {Option} from "fp-ts/Option";
+import {fromIOEither, fromNullable} from "enonic-fp/utils";
+
+/**
+ * Returns the Some<Content> if "id" is valid
+ */
+export function getAsOption<A extends object>(paramsOrKey?: string | GetContentParams): Option<Content<A>> {
+  return pipe(
+    paramsOrKey,
+    fromNullable(notFoundError),
+    chain((params) => get<A>(params)),
+    fromIOEither
+  );
+}
 
 export function getContentByIds<A extends object>(ids: Array<string>): IOEither<EnonicError, ReadonlyArray<Content<A>>>;
 export function getContentByIds<A extends object>(ids: Array<string | undefined>): IOEither<EnonicError, ReadonlyArray<Content<A> | undefined>>;
