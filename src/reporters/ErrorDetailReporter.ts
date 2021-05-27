@@ -1,82 +1,88 @@
-import {Context, ValidationError} from 'io-ts';
-import {Reporter} from "io-ts/lib/Reporter";
-import {fold} from 'fp-ts/Either';
-import {ErrorDetail} from "enonic-fp/errors";
-import {LocalizeWithPrefixParams} from "enonic-fp/controller";
-import {localizeFirst} from "enonic-fp/i18n";
-import {pipe} from "fp-ts/pipeable";
-import {getOrElse} from "fp-ts/Option";
-import {LocalizeParams} from "enonic-types/i18n";
+import { Context, ValidationError } from "io-ts";
+import { Reporter } from "io-ts/lib/Reporter";
+import { fold } from "fp-ts/Either";
+import { ErrorDetail } from "enonic-fp/errors";
+import { LocalizeWithPrefixParams } from "enonic-fp/controller";
+import { localizeFirst } from "enonic-fp/i18n";
+import { pipe } from "fp-ts/function";
+import { getOrElse } from "fp-ts/Option";
+import { LocalizeParams } from "enonic-types/i18n";
 
-export function getErrorDetailReporter(localizeParams?: LocalizeWithPrefixParams): Reporter<Array<ErrorDetail>> {
+export function getErrorDetailReporter(
+  localizeParams?: LocalizeWithPrefixParams
+): Reporter<Array<ErrorDetail>> {
   return {
     report: fold(
-      (es) => es.map(err => validationErrorToErrorDetail(err, localizeParams)),
+      (es) =>
+        es.map((err) => validationErrorToErrorDetail(err, localizeParams)),
       () => []
-    )
-  }
+    ),
+  };
 }
 
-function validationErrorToErrorDetail(err: ValidationError, localizeParams?: LocalizeWithPrefixParams): ErrorDetail {
+function validationErrorToErrorDetail(
+  err: ValidationError,
+  localizeParams?: LocalizeWithPrefixParams
+): ErrorDetail {
   const key = getPathInInterface(err.context);
 
   return pipe(
     getMessageKeys(key, isLastEmpty(err.context), localizeParams),
     localizeFirst,
-    getOrElse(() => err.message ?? 'Invalid value'),
-    (message) => (
-      {
-        key,
-        message
-      }
-    )
+    getOrElse(() => err.message ?? "Invalid value"),
+    (message) => ({
+      key,
+      message,
+    })
   );
 }
 
-function getMessageKeys(key: string, fieldIsEmpty: boolean, localizeParams?: LocalizeWithPrefixParams): Array<LocalizeParams> {
+function getMessageKeys(
+  key: string,
+  fieldIsEmpty: boolean,
+  localizeParams?: LocalizeWithPrefixParams
+): Array<LocalizeParams> {
   const i18nPrefix = localizeParams?.i18nPrefix ?? "errors";
 
   const keyedMessageKeys = [
     `${i18nPrefix}.bad-request-error.${key}`,
     `${i18nPrefix}.400.${key}`,
-    `${i18nPrefix}.${key}`
+    `${i18nPrefix}.${key}`,
   ];
 
-  const emptyMessageKeys =  [
+  const emptyMessageKeys = [
     `errors.bad-request-error.defaultEmpty`,
-    `errors.400.defaultEmpty`
+    `errors.400.defaultEmpty`,
   ];
 
   const defaultMessageKeys = [
     `${i18nPrefix}.bad-request-error`,
     `${i18nPrefix}.400`,
     `errors.bad-request-error.default`,
-    `errors.400.default`
+    `errors.400.default`,
   ];
 
   return keyedMessageKeys
     .concat(fieldIsEmpty ? emptyMessageKeys : [])
     .concat(defaultMessageKeys)
-    .map(key => (
-      {
-        ...localizeParams,
-        key
-      }
-    ));
+    .map((key) => ({
+      ...localizeParams,
+      key,
+    }));
 }
 
 /**
  * Used for i18n to differenciate empty value
  */
 function isLastEmpty(context: Context): boolean {
-  const entries = context.filter(c => c.key !== "");
+  const entries = context.filter((c) => c.key !== "");
   const last = entries[entries.length - 1];
 
-  return (last.actual === undefined)
-    || (last.actual === null)
-    || isString(last.actual)
-      ? last.actual?.length === 0
-      : false
+  return last.actual === undefined ||
+    last.actual === null ||
+    isString(last.actual)
+    ? last.actual?.length === 0
+    : false;
 }
 
 function isString(s: unknown): s is string {
@@ -85,7 +91,7 @@ function isString(s: unknown): s is string {
 
 function getPathInInterface(context: Context): string {
   return context
-    .filter(c => c.key !== "")
-    .map(c => c.key)
-    .join('.')
+    .filter((c) => c.key !== "")
+    .map((c) => c.key)
+    .join(".");
 }

@@ -2,3 +2,5 @@ tsconfig.json
 src
 .idea
 .editorconfig
+.eslintignore
+.eslintrc.json
