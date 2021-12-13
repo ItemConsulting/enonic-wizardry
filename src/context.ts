@@ -1,9 +1,9 @@
 import { run } from "enonic-fp/context";
 import { chain, IOEither } from "fp-ts/IOEither";
-import { RunContext } from "enonic-types/context";
+import { ContextAttributes, RunContext } from "/lib/xp/context";
 
-export function chainRun(
-  runContext: RunContext
+export function chainRun<Attributes extends ContextAttributes>(
+  runContext: RunContext<Attributes>
 ): <E, A, B>(
   f: (a: A) => IOEither<E, B>
 ) => (ma: IOEither<E, A>) => IOEither<E, B> {

@@ -3,11 +3,11 @@ import {
   chain,
   chainFirst,
   filterOrElse,
-  ioEither,
   IOEither,
   map,
   right,
 } from "fp-ts/IOEither";
+import * as IOE from "fp-ts/IOEither";
 import { pipe } from "fp-ts/function";
 import {
   create,
@@ -29,12 +29,12 @@ import {
   GetContentParams,
   ModifyContentParams,
   QueryResponse,
-} from "enonic-types/content";
-import { MultipartItem } from "enonic-types/portal";
+} from "/lib/xp/content";
+import { MultipartItem } from "/lib/xp/portal";
 import { identity } from "fp-ts/function";
 import { array } from "fp-ts/Array";
 import { Separated } from "fp-ts/Separated";
-import { IO, io } from "fp-ts/IO";
+import { io, IO } from "fp-ts/IO";
 import { Option } from "fp-ts/Option";
 import { fromIOEither, fromNullable } from "enonic-fp/utils";
 
@@ -171,7 +171,7 @@ export function createMediaFromAttachment<A extends object>(
   params: CreateMediaFromAttachmentParams
 ): IOEither<EnonicError, Content<A>> {
   return pipe(
-    sequenceS(ioEither)({
+    sequenceS(IOE.ApplyPar)({
       data: getMultipartStream(params.name, params.index),
       item: getMultipartItem(params.name, params.index),
     }),

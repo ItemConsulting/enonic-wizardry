@@ -1,5 +1,5 @@
 import { chain, IOEither, right } from "fp-ts/IOEither";
-import { GetMenuParams, MenuItem } from "enonic-types/menu";
+import { GetMenuParams, MenuItem } from "/lib/menu";
 import { get as getContent } from "enonic-fp/content";
 import { getSubMenus } from "enonic-fp/menu";
 import { EnonicError } from "enonic-fp/errors";

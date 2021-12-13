@@ -6,7 +6,7 @@ import { LocalizeWithPrefixParams } from "enonic-fp/controller";
 import { localizeFirst } from "enonic-fp/i18n";
 import { pipe } from "fp-ts/function";
 import { getOrElse } from "fp-ts/Option";
-import { LocalizeParams } from "enonic-types/i18n";
+import { LocalizeParams } from "/lib/xp/i18n";
 
 export function getErrorDetailReporter(
   localizeParams?: LocalizeWithPrefixParams
