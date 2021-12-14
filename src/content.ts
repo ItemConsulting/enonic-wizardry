@@ -1,4 +1,8 @@
-import { badRequestError, EnonicError, notFoundError } from "enonic-fp/errors";
+import {
+  badRequestError,
+  type EnonicError,
+  notFoundError,
+} from "enonic-fp/errors";
 import {
   chain,
   chainFirst,
@@ -6,9 +10,9 @@ import {
   IOEither,
   map,
   right,
-} from "fp-ts/IOEither";
-import * as IOE from "fp-ts/IOEither";
-import { pipe } from "fp-ts/function";
+} from "fp-ts/es6/IOEither";
+import * as IOE from "fp-ts/es6/IOEither";
+import { pipe } from "fp-ts/es6/function";
 import {
   create,
   createMedia,
@@ -20,8 +24,8 @@ import {
 } from "enonic-fp/content";
 import { runInDraftContext } from "./context";
 import { getMultipartItem, getMultipartStream } from "enonic-fp/portal";
-import { sequenceS } from "fp-ts/Apply";
-import {
+import { sequenceS } from "fp-ts/es6/Apply";
+import type {
   ByteSource,
   Content,
   CreateContentParams,
@@ -30,13 +34,13 @@ import {
   ModifyContentParams,
   QueryResponse,
 } from "/lib/xp/content";
-import { MultipartItem } from "/lib/xp/portal";
-import { identity } from "fp-ts/function";
-import { array } from "fp-ts/Array";
-import { Separated } from "fp-ts/Separated";
-import { io, IO } from "fp-ts/IO";
-import { Option } from "fp-ts/Option";
+import type { MultipartItem } from "/lib/xp/portal";
+import { identity } from "fp-ts/es6/function";
+import type { Separated } from "fp-ts/es6/Separated";
+import type { Option } from "fp-ts/es6/Option";
 import { fromIOEither, fromNullable } from "enonic-fp/utils";
+import * as ARR from "fp-ts/es6/Array";
+import * as IO from "fp-ts/es6/IO";
 
 /**
  * Returns the Some<Content> if "id" is valid
@@ -96,8 +100,8 @@ function notEmptyOrUndefined(str?: string): str is string {
 
 export function createAll<A extends object>(
   paramsList: Array<CreateContentParams<A>>
-): IO<Separated<Array<EnonicError>, Array<Content<A>>>> {
-  return array.wilt(io)(paramsList.map(create), identity);
+): IO.IO<Separated<Array<EnonicError>, Array<Content<A>>>> {
+  return pipe(paramsList.map(create), ARR.wilt(IO.Applicative)(identity));
 }
 
 export function createAndPublish<A extends object>(

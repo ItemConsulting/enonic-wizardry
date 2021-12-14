@@ -1,11 +1,11 @@
-import { Errors, Type } from "io-ts";
+import type { Errors, Type } from "io-ts";
 import * as t from "io-ts";
-import { Either } from "fp-ts/Either";
+import type { Either } from "fp-ts/es6/Either";
 import { getErrorDetailReporter } from "./reporters/ErrorDetailReporter";
-import { badRequestError, EnonicError } from "enonic-fp/errors";
-import { fromEither, IOEither, mapLeft } from "fp-ts/IOEither";
-import { pipe } from "fp-ts/function";
-import { LocalizeWithPrefixParams } from "enonic-fp/controller";
+import { badRequestError, type EnonicError } from "enonic-fp/errors";
+import { fromEither, IOEither, mapLeft } from "fp-ts/es6/IOEither";
+import { pipe } from "fp-ts/es6/function";
+import type { LocalizeWithPrefixParams } from "enonic-fp/controller";
 
 export function validate<A, O = A, I = unknown>(
   a: Type<A, O, I>,

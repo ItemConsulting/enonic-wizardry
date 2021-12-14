@@ -1,12 +1,12 @@
-import { Context, ValidationError } from "io-ts";
-import { Reporter } from "io-ts/lib/Reporter";
-import { fold } from "fp-ts/Either";
-import { ErrorDetail } from "enonic-fp/errors";
-import { LocalizeWithPrefixParams } from "enonic-fp/controller";
+import type { Context, ValidationError } from "io-ts";
+import type { Reporter } from "io-ts/lib/Reporter";
+import { fold } from "fp-ts/es6/Either";
+import type { ErrorDetail } from "enonic-fp/errors";
+import type { LocalizeWithPrefixParams } from "enonic-fp/controller";
 import { localizeFirst } from "enonic-fp/i18n";
-import { pipe } from "fp-ts/function";
-import { getOrElse } from "fp-ts/Option";
-import { LocalizeParams } from "/lib/xp/i18n";
+import { pipe } from "fp-ts/es6/function";
+import { getOrElse } from "fp-ts/es6/Option";
+import type { LocalizeParams } from "/lib/xp/i18n";
 
 export function getErrorDetailReporter(
   localizeParams?: LocalizeWithPrefixParams

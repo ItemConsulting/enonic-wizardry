@@ -1,6 +1,6 @@
 import { run } from "enonic-fp/context";
-import { chain, IOEither } from "fp-ts/IOEither";
-import { ContextAttributes, RunContext } from "/lib/xp/context";
+import { chain, IOEither } from "fp-ts/es6/IOEither";
+import type { ContextAttributes, RunContext } from "/lib/xp/context";
 
 export function chainRun<Attributes extends ContextAttributes>(
   runContext: RunContext<Attributes>
